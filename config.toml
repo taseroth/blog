@@ -1,37 +1,20 @@
 baseURL = "http://example.org/"
 languageCode = "en-us"
-title = "leading zero"
-theme = "hyde-x"
-AuthorName = "Bert Radke"
+title = "personal blog"
+theme = "pavot"
 
 
 
 [params]
-    # If false display full article contents in blog index.
-    # Otherwise show description and 'read on' link to individual blog post page.
-    # Default (if omitted) is true.
-    truncate = true
-
-    # Used when a given page doesn't set its own.
-    defaultDescription = "Your default page description"
-    defaultKeywords = "your,default,page,keywords"
 
     # Hide estimated reading time for posts.
     # Default (if omitted) is false.
     hideReadingTime = false
 
-    # Changes sidebar background and link/accent colours.
-    # See below for more colour options.
-    # This also works: "theme-base-08 layout-reverse", or just "layout-reverse".
-    theme = "theme-base-08 layout-reverse"
-
     # Select a syntax highight.
     # Check the static/css/highlight directory for options.
     highlight = "obsidian"
     # highlight = "sunburst"
-
-    # Optional additional custom CSS file URL, will override other styles.
-    customCSS = ""
 
     # Displays under the author name in the sidebar, keep it short.
     # You can use markdown here.
@@ -41,19 +24,11 @@ AuthorName = "Bert Radke"
     # Default (if omitted) is "Blog".
     home = "Blog"
 
-    # Metadata used to drive integrations.
-   # googleAnalytics = "Your Google Analytics tracking code"
-   # gravatarHash = "MD5 hash of your Gravatar email address"
-
     # Sidebar social links, these must be full URLs.
     github = ""
-  #  bitbucket = ""
     stackOverflow = ""
     linkedin = ""
-    googleplus = ""
-  #  facebook = ""
     twitter = "https://twitter.com/taseroth"
-  #  youtube = ""
 
     # Other social-like sidebar links
     rss = true  # switch to true to enable RSS icon link
