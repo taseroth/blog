@@ -1,34 +1,50 @@
 baseURL = "http://example.org/"
 languageCode = "en-us"
-title = "personal blog"
-theme = "pavot"
+theme = "hyde-hyde"
+title = "Bert Radke"
 
-
-
+## Site Settings
 [params]
+    author = "Bert Radke"
+    description = "there is no silver bullet"
+    authorimage = "/img/bert_radke.png"
+    dateformat = "2006-01-02"
+    highlightjs = true
+    highlightjsstyle = "darcula"
+    postNavigation = false
+    # please choose either GraphComment or Disqus
+    #GraphCommentId = "..."
 
-    # Hide estimated reading time for posts.
-    # Default (if omitted) is false.
-    hideReadingTime = false
+    # Table of contents
+    #toc = none, "hugo", or "tocbot"
 
-    # Select a syntax highight.
-    # Check the static/css/highlight directory for options.
-    highlight = "obsidian"
-    # highlight = "sunburst"
+## Social Accounts
+[params.social]
+    github = "taseroth"
+    xing = "Bert_Radke"
+    linkedin = "bert-radke-3a533736"
+    twitter = "taseroth"
+    stackoverflow = "132270/bert"
+    email = "bert.radke@protonmail.com"
 
-    # Displays under the author name in the sidebar, keep it short.
-    # You can use markdown here.
-    tagline = "There is no silver bullet"
-
-    # Text for the top menu link, which goes the root URL for the site.
-    # Default (if omitted) is "Blog".
-    home = "Blog"
-
-    # Sidebar social links, these must be full URLs.
-    github = ""
-    stackOverflow = ""
-    linkedin = ""
-    twitter = "https://twitter.com/taseroth"
-
-    # Other social-like sidebar links
-    rss = true  # switch to true to enable RSS icon link
+## Main Menu
+[[menu.main]]
+    name = "Posts"
+    weight = 100
+    identifier = "posts"
+    url = "/posts/"
+[[menu.main]]
+    name = "Portfolio"
+    identifier = "portfolio"
+    weight = 200
+    url = "/portfolio/"
+[[menu.main]]
+    name = "About"
+    identifier = "about"
+    weight = 300
+    url = "/about/"
+[[menu.main]]
+    name = "Imprint"
+    identifier = "imprint"
+    weight = 999
+    url = "/imprint/"

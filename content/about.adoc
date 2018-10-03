@@ -1,0 +1,23 @@
++++
+title = "About"
+image = "img/about-header.jpg"
++++
+
+Hi, my name ist Bert Radke and I 'do' software for over 20 years now.
+In 2018 I moved with my family from Dresden to Munich.
+
+My interest in all things computer started way back when I was still in high school. Back than, esp. in the former
+east of germany, computers where not something easily available so I had to build my own from the scratch
+(https://en.wikipedia.org/wiki/Robotron_Z1013[Z1013]), or program on computer.
+
+Times changed fast and by now I have programmed in languages ranging from C/C++ over PL/SQL (yuck!)
+(and Oracle Forms, double yuck!), TypeScript and are currently Java for a wide variety of fields including
+the semiconductor industry, energy trading, logistics and health care.
+
+In the recent years I have give a few talks at local community events, mostly with my
+friend https://twitter.com/magomi[Marco]. I'm by no means an experienced speaker, but, surprisingly, I enjoy presenting.
+
+**This blog** is managed by https://hugo.io[Hugo], an static site generator, allowing me to write in
+https://asciidoctor.org/[AsciiDoc]. Add https://github.com/taseroth[GitHub] and https://www.netlify.com/[Netlify]
+to the mix and my inner nerd is happy and hopefully wont realize that blogging actually means writing.
+

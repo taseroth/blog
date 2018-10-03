@@ -1,0 +1,22 @@
+{{ partial "header/styles-highlight.html" . }}
+
+{{ if .Site.IsServer }}
+{{ $cssOpts := (dict "targetPath" "styles/main.css" "enableSourceMap" true ) }}
+{{ $styles := resources.Get "scss/main.scss" | toCSS $cssOpts }}
+<link rel="stylesheet" href="{{ $styles.Permalink }}" media="screen">
+{{ else }}
+{{ $cssOpts := (dict "targetPath" "styles/main.css" ) }}
+{{ $styles := resources.Get "scss/main.scss" | toCSS $cssOpts | postCSS | minify | fingerprint }}
+<link rel="stylesheet" href="{{ $styles.Permalink }}" integrity="{{ $styles.Data.Integrity }}" media="screen">
+{{ end }}
+<!--
+<link rel="stylesheet" href="{{ "css/hyde-hyde.css" | relURL }}">
+-->
+<link rel="stylesheet" href="{{ "css/print.css" | relURL }}" media="print">
+{{ with .Site.Params.toc }}
+  {{ if eq . "hugo" }}
+    <link rel="stylesheet" href="{{ "css/hugo-toc.css" | relURL }}">
+  {{ else if eq . "tocbot"}}
+    <link rel="stylesheet" href="{{ "css/tocbot.css" | relURL }}">
+  {{ end }}
+{{ end }}

@@ -1,0 +1,5 @@
+{{ with .Params.image }}
+    <div class="top-image">
+        <img src="{{ . | relURL }}">
+    </div>
+{{ end }}
