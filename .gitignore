@@ -33,4 +33,3 @@ fabric.properties
 *.out
 
 /public/
-/resources/_gen/

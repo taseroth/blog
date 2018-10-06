@@ -20,4 +20,6 @@ friend https://twitter.com/magomi[Marco]. I'm by no means an experienced speaker
 **This blog** is managed by https://hugo.io[Hugo], an static site generator, allowing me to write in
 https://asciidoctor.org/[AsciiDoc]. Add https://github.com/taseroth[GitHub] and https://www.netlify.com/[Netlify]
 to the mix and my inner nerd is happy and hopefully wont realize that blogging actually means writing.
+The theme is based on https://themes.gohugo.io/hyde-hyde/[Hyde-Hyde], with alterations to the layout and colouring.
+Also, since Hugo now supports asset-pipelines, I make use of them to work with the scss directly.
 
