@@ -1,6 +1,6 @@
 [build]
 publish = "public"
-command = "/opt/buildhome/repo/publish.sh"
+command = "/opt/buildhome/publish.sh"
 
 [context.production.environment]
   HUGO_VERSION = "0.49"
