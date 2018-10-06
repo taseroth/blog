@@ -1,11 +1,11 @@
 @font-face {
   font-family: 'fa-downsized';
-  src: url('../font/fa-downsized.eot?80816191');
-  src: url('../font/fa-downsized.eot?80816191#iefix') format('embedded-opentype'),
-       url('../font/fa-downsized.woff2?80816191') format('woff2'),
-       url('../font/fa-downsized.woff?80816191') format('woff'),
-       url('../font/fa-downsized.ttf?80816191') format('truetype'),
-       url('../font/fa-downsized.svg?80816191#fa-downsized') format('svg');
+  src: url('../font/fa-downsized.eot?54526150');
+  src: url('../font/fa-downsized.eot?54526150#iefix') format('embedded-opentype'),
+       url('../font/fa-downsized.woff2?54526150') format('woff2'),
+       url('../font/fa-downsized.woff?54526150') format('woff'),
+       url('../font/fa-downsized.ttf?54526150') format('truetype'),
+       url('../font/fa-downsized.svg?54526150#fa-downsized') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -15,7 +15,7 @@
 @media screen and (-webkit-min-device-pixel-ratio:0) {
   @font-face {
     font-family: 'fa-downsized';
-    src: url('../font/fa-downsized.svg?80816191#fa-downsized') format('svg');
+    src: url('../font/fa-downsized.svg?54526150#fa-downsized') format('svg');
   }
 }
 */
@@ -56,6 +56,8 @@
 }
  
 .icon-mail:before { content: '\e800'; } /* '' */
+.icon-calendar:before { content: '\e801'; } /* '' */
+.icon-tags:before { content: '\e802'; } /* '' */
 .icon-twitter:before { content: '\f099'; } /* '' */
 .icon-github-circled:before { content: '\f09b'; } /* '' */
 .icon-xing:before { content: '\f168'; } /* '' */
