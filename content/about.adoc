@@ -8,7 +8,7 @@ In 2018 I moved with my family from Dresden to Munich.
 
 My interest in all things computer started way back when I was still in high school. Back than, esp. in the former
 east of germany, computers where not something easily available so I had to build my own from the scratch
-(https://en.wikipedia.org/wiki/Robotron_Z1013[Z1013]), or program on computer.
+(https://en.wikipedia.org/wiki/Robotron_Z1013[Z1013]), or program on paper.
 
 Times changed fast and by now I have programmed in languages ranging from C/C++ over PL/SQL (yuck!)
 (and Oracle Forms, double yuck!), TypeScript and are currently Java for a wide variety of fields including

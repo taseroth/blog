@@ -27,8 +27,7 @@
   }
 
   .social {
-    font-size: small;
-    text-align: center;
+    font-size: 0.9rem;
     a {
       padding: 0 4px;
       @include link-no-decoration();
@@ -40,6 +39,22 @@
     bottom: 1rem;
   }
 
+  .icon {
+    font-family: "fa-downsized";
+    font-style: normal;
+    font-weight: normal;
+    speak: none;
+    display: inline-block;
+    text-decoration: inherit;
+    width: 1em;
+    margin-right: .2em;
+    text-align: center;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1em;
+  //  margin-left: .2em;
+    -webkit-font-smoothing: antialiased;
+  }
 }
 
 .sidebar-nav {
