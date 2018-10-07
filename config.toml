@@ -7,7 +7,7 @@ title = "Bert Radke"
 [params]
     author = "Bert Radke"
     description = "there is no silver bullet"
-    authorimage = "/img/bert_radke.png"
+    authorimage = "img/bert_radke.png"
     dateformat = "2006-01-02"
     highlightjs = true
     highlightjsstyle = "darcula"

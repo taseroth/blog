@@ -4,7 +4,7 @@
   </span>
   {{ with .Site.Params.authorimage }}
   <div class="author-image">
-    <img src="{{ .Site.Params.authorimage }}" alt="Author Image" class="img--circle img--headshot element--center">
+    <img src="{{ .Site.Params.authorimage | relURL }}" alt="Author Image" class="img--circle img--headshot element--center">
   </div>
   {{ end }}
   <p class="site__description">
