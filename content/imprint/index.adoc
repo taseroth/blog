@@ -1,10 +1,11 @@
----
-title: "Imprint"
-layout: post
-type:  "post"
-draft: false
-image: "img/imprint-header.png"
----
++++
+title = "Imprint"
+type = "meta"
+draft = false
+[[resources]]
+  name = "header"
+  src = "img/header.png"
++++
 
 Bert Radke +
 Oberhuberstrasse 5 +

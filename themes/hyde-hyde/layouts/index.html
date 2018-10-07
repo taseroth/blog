@@ -4,7 +4,7 @@
 
 {{ define "content" }}
   <div class="post-list">
-    {{ $paginator := .Paginate (where .Data.Pages "Type" "posts") }}
+    {{ $paginator := .Paginate (where .Data.Pages "Type" "post") }}
     {{ range $paginator.Pages }}
       <div class="post-list__item">
         <span class="item__title--big">

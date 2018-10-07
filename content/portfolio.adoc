@@ -1,6 +1,0 @@
----
-title: "Portfolio"
-image: "img/portfolio-header.png"
----
-
-tbd

@@ -1,6 +1,9 @@
 +++
 title = "About"
-image = "img/about-header.jpg"
+type = "meta"
+[[resources]]
+  name = "header"
+  src = "img/header.jpg"
 +++
 
 Hi, my name ist Bert Radke and I 'do' software for over 20 years now.

@@ -1,5 +1,7 @@
-{{ with .Params.image }}
+{{ $images := .Resources.ByType "image" }}
+{{ $header := $images.GetMatch "header*" }}
+{{ with $header }}
     <div class="top-image">
-        <img src="{{ . | relURL }}">
+        <img src="{{ $header.RelPermalink }}">
     </div>
 {{ end }}
