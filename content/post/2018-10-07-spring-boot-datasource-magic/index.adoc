@@ -1,0 +1,64 @@
++++
+title= "Spring boot datasource magic"
+slug= "spring-boot-datasource-magic"
+date= 2018-10-07T13:46:31+02:00
+lastmod= 2018-10-07T13:46:31+02:00
+tags = [ "Spring Boot", "JDBC", "Java"]
+layout= "post"
+type=  "post"
+draft= true
++++
+
+
+We were refactoring a project recently and and started cutting functionality out and moving it into a separate little
+application. This new application needed to look up references from a single relation table. For this we choose to use
+https://spring.io/guides/gs/relational-data-access/[spring-jdbc] inside a spring-boot application.
+Looking at the
+https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-sql.html#boot-features-connect-to-production-database[documentation],
+this  should have been as easy as using the right property names in application.properties, but it was not.
+Not having the time to investigate, I opted for supplying a Datasource manually:
+[source,java]
+----
+@Bean
+public DataSource dataSource() {
+    return DataSourceBuilder.create()
+            .url("jdbc:postgresql:testdb")
+            .username("testuser")
+            .password("secret")
+            .build();
+}
+----
+And planed to write this blog explaining the setup. In writing this post, I learned that spring *does* build a datasource
+for you if you have the right dependencies and properties. The problem I faced did stem from an in-house  ApplicationListener
+that is being used to load application.properties in a specific way.
+
+
+Since I'm already on it, here is a quick run-down on providing a datasource with spring boot.
+
+## Project setup
+Head over to the https://start.spring.io/[spring initializr] to generate a new empty project. We will only need JDBC
+and an database drive. I'm going to use PostgreSQL.
+
+When you try to run the generated @SpringBootApplication, it will fail with the following message:
+
+[source]
+----
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Failed to configure a DataSource: 'url' attribute is not specified and no embedded datasource could be configured.
+
+Reason: Failed to determine a suitable driver class
+----
+
+We need to provide information about the database we want to use:
+[source,java]
+----
+spring.datasource.url=jdbc:postgresql:testdb
+spring.datasource.username=testuser
+spring.datasource.password=geheim
+----
+

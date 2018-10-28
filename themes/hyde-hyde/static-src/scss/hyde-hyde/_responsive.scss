@@ -23,12 +23,12 @@
     padding: 0;
   }
   .menu-content {
-    padding: 0 0 0 0px;
+    padding: 0 0 0 0;
     max-height: 0;
     overflow: hidden;
     margin-top: 0; }
   .collapsible-menu {
-    padding: 0px 0px; 
+    padding: 0 0;
   }
   .collapsible-menu ul {
     list-style-type: none;
@@ -45,7 +45,7 @@
     display: block;
     cursor: pointer;
     color: #fff;
-    padding: 10px 0 10px 0px; }
+    padding: 10px 0 10px 0; }
   
   input#menuToggle {
     display: none; 
@@ -88,7 +88,10 @@
     right: 1rem;
     top: 1rem;
   }
-  .content {
+  .main {
+      padding-bottom: 2rem;
+      padding-top: 2rem;
+
     margin-left: $sidebar-width + 1;
     margin-right: 1rem;
 //    max-width: 38rem;
