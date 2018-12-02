@@ -1,0 +1,126 @@
++++
+title= "Using dynamic ports in spring boot integration tests"
+slug= "dynamic-port-spring-test"
+date= 2018-10-28T18:06:15+01:00
+lastmod= 2018-12-02T18:06:15+01:00
+tags = [ "Spring Boot", "JUnit", "Java"]
+layout= "post"
+type=  "post"
++++
+When doing integration testing, it is quite common to start external processes. A typical example is testing if your
+program is sending emails correctly. http://www.icegreen.com/greenmail/[GreenMail] provides an easy way of doing so
+and the documentation is helpful as well.
+
+While there are plentiful examples out there demonstrating how to do this, most use a fixed port to start Greenmail on.
+When running tests in parallel, or when the CI server is running tests on different branches simultaneously, this test
+will fail due to the port already in use.
+
+I use GreenMail as an example only, the same technique could be applied to other services as well.
+
+Typically, this will look similar to:
+[source,java]
+----
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class SomeServiceTest {
+
+    @Value("${smtp.port}") <1>
+    private int port;
+
+    @Value("${email.user}")
+    private String user;
+
+    @Value("${email.password}")
+    private String password;
+
+    private GreenMail smtpServer;
+
+    @Autowired
+    private SomeService sut;
+
+    @Before
+    public void setUp() {
+        smtpServer = new GreenMail(new ServerSetup(port, null, PROTOCOL_SMTP));
+        smtpServer.setUser(user, password);
+        smtpServer.start();
+    }
+
+    @After
+    public void after() {
+        smtpServer.stop();
+    }
+
+    @Test
+    public void emailShouldBeSend() {
+
+        // prepare
+        String toAddress = "receiver@test";
+        String subject = "sending email from test";
+        String body = "the body of our test email";
+        // act
+        sut.sendEmail(toAddress, subject, body);
+
+        // expect
+        Message[] receivedMessages = smtpServer.getReceivedMessages();
+        Assert.assertEquals("only one email should be send", 1, receivedMessages.length);
+        // test other aspects of the message ...
+    }
+}
+<1> We inject the parameters we need for the GreenMail service via springs value injection.
+    The code under test would use the same mechanism.
+----
+
+This is quite a lot of code just to set up and tear down the GreenMail service. If we have more
+than one test class needing the service, we would have to either duplicate the code or introduce
+inheritance. Both are no good options.
+
+== Move GreenMail into a JUnit Rule
+Fortunately, we can use
+https://junit.org/junit4/javadoc/4.12/org/junit/Rule.html[JUnit Rule]s to move all the setup code
+into another class and include when needed:
+[source,java]
+----
+@Component
+public class SmtpServerRule extends ExternalResource {
+... all the initialisation, setup and teardown from above ...
+}
+----
+This could than be used in the test as follows:
+[source,java]
+----
+@Autowired
+@Rule
+public SmtpServerRule smtpServerRule = new SmtpServerRule();
+----
+
+== Use a dynamically assigned random port
+So far, we still use a statically configured port. Spring provides a utility to find an unused port
+with `SocketUtils.findAvailableTcpPort()`. This left us with the need to inject the value of the free port back into
+the spring environment. And this *before* the spring context is used to start up the beans we want to test.
+The `@SpringBootTest` annotation provides a mean of adding/changing values to the Spring environment
+via the +properties+ attributes, but these are static values by nature.
+
+One way to solve the problem is by providing an implementation of an `ApplicationContextInitializer`
+that uses the `SocketUtils` and add the found port under a given name to the environment:
+[source,java]
+----
+public static class RandomPortInitializer
+            implements ApplicationContextInitializer<ConfigurableApplicationContext> {
+
+        @Override
+        public void initialize(ConfigurableApplicationContext applicationContext) {
+
+            int randomPort = SocketUtils.findAvailableTcpPort();
+            TestPropertySourceUtils.addInlinedPropertiesToEnvironment(applicationContext,
+                    "smtp.port=" + randomPort);
+        }
+    }
+----
+This class must be configured as an initializer:
+[source,java]
+----
+@ContextConfiguration(initializers = { SmtpServerRule.RandomPortInitializer.class})
+----
+
+Full source code can be found in the https://github.com/taseroth/blog-dynamic-port[GitHub repository].
+The intermediate steps are provided via tags.
