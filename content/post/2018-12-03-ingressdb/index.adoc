@@ -74,17 +74,17 @@ Coming from a relational background, this is the model I came up with:
 image::img/data_model.png[data model, ,400]
 
 Expecting that attacks are the most frequent entity, I decided to group all attacks on a portal within a
-certain time window into one ```PortalAttack```. It made the writing logic slightly more complex
+certain time window into one `PortalAttack`. It made the writing logic slightly more complex
 but allowed for easy lookups later on for the functionality to lookup 'game buddies': agents often playing
-together.
-The ```:USES``` relation was later used to map home/work portals to agents.
+together. +
+The `:USES` relation was later used to map home/work portals to agents.
 
-The ```User``` node represents the player; the actual human. As the ingress communities were/are in love with
+The `User` node represents the player; the actual human. As the ingress communities were/are in love with
 google plus communities, these are linked to google ids. Due to privacy concerns, I removed the ability
 to freely link agents to users and only allowed registered users to create a link between their agent and user.
 
 The app quickly gained popularity, so I needed a way to track who approved a user, resulting in
-the ```:MODERATOR``` relation on the ```User```.
+the `:MODERATOR` relation on the `User`.
 
 == The result
 The web part was written in https://wicket.apache.org/[Apache Wicket], mostly because I know that
@@ -114,7 +114,7 @@ activity table.
 In the end, about 1500 users were registered at the service with about 50 - 100 using it on a daily
 basis. Through emails parsed, the database did hold:
 
-[cols=2*,options=header]
+[cols="2*",options="header",width="80%"]
 |===
 |Node
 |Entries
@@ -134,7 +134,7 @@ basis. Through emails parsed, the database did hold:
 
 |===
 
-[cols=2*,options=header]
+[cols=2*,options=header,width="80%"]
 |===
 |Relation
 |Entries

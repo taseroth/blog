@@ -1,0 +1,123 @@
+.post__meta {
+  font-size: $meta-font-size;
+  color: $meta-color;
+  font-weight: $meta-font-weight;
+}
+
+.post__category {
+  font-weight: bold;
+}
+
+.post__tag {
+  background: $tag-background-color;
+  border-radius: 2px;
+  color: $tag-color;
+  font-size: $tag-font-size;
+  font-weight: bold;
+  padding: 2px 6px;
+}
+
+.post__title {
+  background-image: -webkit-linear-gradient(left, $gradient-color-1, $gradient-color-2); /* For Chrome and Safari */
+  background-image:    -moz-linear-gradient(left, $gradient-color-1, $gradient-color-2); /* For old Fx (3.6 to 15) */
+  background-image:     -ms-linear-gradient(left, $gradient-color-1, $gradient-color-2); /* For pre-releases of IE 10*/
+  background-image:      -o-linear-gradient(left, $gradient-color-1, $gradient-color-2); /* For old Opera (11.1 to 12.0) */
+  background-image:         linear-gradient(to right, $gradient-color-1, $gradient-color-2); /* Standard syntax; must be last */
+  color:transparent;
+  -webkit-background-clip: text;
+  background-clip: text; 
+ }
+ 
+.post__subtitle {
+  display: block;
+  font-size: $post__subtitle-font-size;
+  font-style: italic;
+  padding: 0 0 1rem 0;
+}
+
+#references {
+  li {
+    font-size: 0.9rem;
+  }
+}
+
+.imageblock {
+  img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+
+    box-shadow: 6px 6px 8px #aaa;
+  }
+  .title {
+    text-align: center;
+  }
+  margin-bottom: 2rem;
+}
+
+li p {
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.admonitionblock {
+  table {
+    border: 0;
+    background: none;
+    width: 100%;
+
+    td.icon {
+      text-align: center;
+      width: 80px;
+
+      img {
+        max-width: none;
+      }
+
+      .title {
+        font-weight: bold;
+        text-transform: uppercase;
+      }
+    }
+
+    td.content {
+      padding-left: 1.125em;
+      padding-right: 1.25em;
+      border-left: 1px solid #dddddd;
+      color: #6f6f6f;
+    }
+
+    :last-child > :last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+
+  margin-left: auto;
+  margin-right: auto;
+
+  /* Zebra striping */
+  tr:nth-of-type(odd) {
+    background: #eee;
+  }
+  th {
+    background: $sidebar-color;
+    color: $gray-1;
+    font-weight: bold;
+  }
+  td, th {
+    border: 1px solid #ccc;
+    text-align: left;
+    p {
+      margin-bottom: 0.5rem;
+      margin-top: 0.5rem;
+      padding-left: 0;
+      padding-right: 0;
+    }
+  }
+}
