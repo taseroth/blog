@@ -167,3 +167,8 @@ All in all, developing with neo4j has been a pleasure, I learned a lot along the
 to use and I was feeling uncertain about not having a schema to rely on. But this turned out to be easy. +
 Due to a bug, I did have to refactor the data later on and ran into problems with too large transaction for the available
 memory. But with https://neo4j-contrib.github.io/neo4j-apoc-procedures/[APOC] and help from Michael, this could be solved as well.
+
+NOTE: People asked for the source code of the IngressDB, but I'm hesitant to show it. It grew out of a POC and I never
+found the time to clean up. Just to add new functions. But I created a
+ https://gist.github.com/taseroth/f4fccb306a275a4bf04907888305df9e[gist showing the repository layer] with the cypher
+ queries. Comments welcome.
