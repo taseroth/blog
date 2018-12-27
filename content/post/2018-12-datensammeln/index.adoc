@@ -1,0 +1,30 @@
++++
+title= "Datensammeln ohne Reue"
+slug= "datensammeln-ohne-reue"
+date= 2018-12-27T22:16:52+01:00
+lastmod= 2018-12-27T22:16:52+01:00
+tags = [ "Talk", "Logging", "SLF4J", "Kibana"]
+layout= "post"
+type=  "post"
+draft= true
+[[resources]]
+  name = "header"
+  src = "img/header.jpg"
++++
+
+Aus einem Gespräch mit einem Kollegen entstand die Idee des Vortrags über Logging in Java.
+Eigentlich ein alter Hut sollte man denken, aber der Vortrag, wieder zusammen mit
+https://twitter.com/magomi[Marco], war sehr gut besucht und es gab im Nachgang auch eine
+recht angeregte Diskussion.
+
+Vielleicht ein Hinweis, das das übliche Konferenzprogramm nicht nur dem Hype-Cycle folgen sollte.
+
+Im Vortrag betrachten wir die verschiedenen Gründe des Loggings, gehen kurz auf die vorhandenen Frameworks ein
+sowie zum Tooling für ein zentralisiertes Logging.
+
+Vielen Dank an die https://jugsaxony.org/[JUG Saxony] für die Organisation und das Aufzeichnen des Vortrags.
+
+Die https://jugsaxony.org/wp-content/uploads/2016/05/Slides_Datensammeln_ohne_Reue.pdf[Folien] sind sind auch als PDF verfügbar.
+
+{{< youtube MTjFfLWsFpI >}}
+
