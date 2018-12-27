@@ -18,6 +18,10 @@ title = "Bert Radke"
     # Table of contents
     #toc = none, "hugo", or "tocbot"
 
+[privacy]
+[privacy.youtube]
+    privacyEnhanced = true
+
 ## Social Accounts
 [params.social]
     github = "taseroth"
