@@ -6,7 +6,7 @@ lastmod= 2018-12-27T22:16:52+01:00
 tags = [ "Talk", "Logging", "SLF4J", "Kibana"]
 layout= "post"
 type=  "post"
-draft= true
+draft= false
 [[resources]]
   name = "header"
   src = "img/header.jpg"
