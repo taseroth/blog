@@ -90,7 +90,7 @@ This could than be used in the test as follows:
 ----
 @Autowired
 @Rule
-public SmtpServerRule smtpServerRule = new SmtpServerRule();
+public SmtpServerRule smtpServerRule;
 ----
 
 == Use a dynamically assigned random port
