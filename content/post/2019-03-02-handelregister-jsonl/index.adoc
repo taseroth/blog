@@ -16,7 +16,7 @@ that I could simplify the import. The ```apoc.load.json()``` can process JSONL f
 Also, with ```apoc.create.relationship()``` the creation of dynamic relations becomes a lot simpler.
 
 
-=== Identities
+== Identities
 https://twitter.com/opencorporates/[Opencorporates] posted a https://blog.opencorporates.com/2019/02/19/wait-what-the-problems-of-company-numbers-in-germany-and-how-were-handling-them/[blog post]
 recently detailing that the ```native_company_number``` in the German coorperates data is not unique. I previously used these as
 identifiers for the merge command when importing. On second thought, as each company should only occur once
@@ -28,7 +28,7 @@ for the ```:Officer```, I used their names. These are very likely not unique, le
 represented as the same officer. For my purposes, this is not a problem. For anything real, these issues
 would need to be addressed.
 
-=== Loading JSONL
+== Loading JSONL
 As I learned, ```apoc.load.json()``` can load JSONL files directly. No need to split and convert the file.
 The procedure will turn the JSONL file into a stream as it is loaded. In our case, each line is a JSON object
 on its own, so we get a stream of maps.
@@ -44,7 +44,7 @@ apoc.periodic.iterate('statement returning items', 'statement per item',
 YIELD batches, total
 ----
 
-=== Creating dynamic relationships
+== Creating dynamic relationships
 For the relations between officers and companies, I want to use the ```position``` attribute from the json file.
 Unfortunately, cypher does not offer a switch or similar statement, so I used a bit of hack involving ```foreach``` statements
 with only one item if a condition was meet.
