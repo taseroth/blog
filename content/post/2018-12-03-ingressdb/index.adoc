@@ -1,6 +1,7 @@
 +++
 title= "IngressDB: a long-running POC with Neo4j"
 slug= "ingressdb-neo4j"
+description = "Analysing Ingress attack data with Neo4j and building heat-maps."
 date= 2018-12-03T21:17:55+01:00
 lastmod= 2018-12-03T21:17:55+01:00
 tags = [ "Neo4j", "Ingress", "Java", "Project"]
@@ -8,7 +9,7 @@ layout= "post"
 type=  "post"
 draft= false
 [[resources]]
-  name = "header"
+  name = "feature"
   src = "img/header.png"
 +++
 

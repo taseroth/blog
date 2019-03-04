@@ -1,5 +1,5 @@
 {{ $images := .Resources.ByType "image" }}
-{{ $header := $images.GetMatch "header*" }}
+{{ $header := $images.GetMatch "feature*" }}
 {{ with $header }}
     <div class="top-image">
         <img src="{{ $header.RelPermalink }}">

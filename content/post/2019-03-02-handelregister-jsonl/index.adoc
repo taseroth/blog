@@ -1,13 +1,14 @@
 +++
 title= "Importing corporate data, take two"
 slug= "handelregister-jsonl"
+description = "Demoing how to import JSONL into Neo4j via apoc."
 date= 2019-03-02T17:25:42+01:00
 lastmod= 2019-03-02T17:25:42+01:00
 tags = [ "Open Data", "Neo4j"]
 layout= "post"
 type=  "post"
 [[resources]]
-  name = "header"
+  name = "feature"
   src = "img/mms.png"
 +++
 

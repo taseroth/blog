@@ -1,6 +1,7 @@
 +++
 title= "{{ replaceRE "^[0-9⁄-]+" "" .Name | humanize }}"
 slug= "{{ replaceRE "^[0-9⁄-]+" "" .Name }}"
+description = "short summary"
 date= {{ .Date }}
 lastmod= {{ .Date }}
 tags = [ "Spring Boot", "JDBC", "Java"]
@@ -8,7 +9,7 @@ layout= "post"
 type=  "post"
 draft= true
 [[resources]]
-  name = "header"
+  name = "feature"
   src = "img/header.jpg"
 +++
 

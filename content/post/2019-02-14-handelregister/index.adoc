@@ -1,13 +1,14 @@
 +++
 title= "Importing corporate data into Neo4j"
 slug= "handelregister-neo4j"
+description = "Loading the German coorperate data into Neo4j"
 date= 2019-02-14T12:07:32+01:00
 lastmod= 2019-02-14T12:07:32+01:00
 tags = [ "Open Data", "Neo4j"]
 layout= "post"
 type=  "post"
 [[resources]]
-  name = "header"
+  name = "feature"
   src = "img/header.jpg"
 +++
 
