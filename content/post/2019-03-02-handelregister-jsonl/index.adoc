@@ -6,7 +6,6 @@ lastmod= 2019-03-02T17:25:42+01:00
 tags = [ "Open Data", "Neo4j"]
 layout= "post"
 type=  "post"
-draft= false
 [[resources]]
   name = "header"
   src = "img/mms.png"
