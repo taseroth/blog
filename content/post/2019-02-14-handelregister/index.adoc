@@ -1,5 +1,5 @@
 +++
-title= "Importing corporate data into neo4j"
+title= "Importing corporate data into Neo4j"
 slug= "handelregister-neo4j"
 date= 2019-02-14T12:07:32+01:00
 lastmod= 2019-02-14T12:07:32+01:00
@@ -14,6 +14,8 @@ type=  "post"
 https://twitter.com/opencorporates[Opencorporates] recently made the German cooperate data
 https://blog.opencorporates.com/2019/02/06/german-company-data-now-available-for-download-via-open-knowledge-deutschland/[publicly available].
 What better moment to learn how to import data into neo4j?
+
+NOTE: There is an improved version of the import in a link:/2019/03/handelregister-jsonl[followup post].
 
 Utilizing  the https://neo4j-contrib.github.io/neo4j-apoc-procedures/[APOC] extension, one can load the data from
 various sources (HTTP, file) in JSON, CSV or XML format.

@@ -1,0 +1,94 @@
++++
+title= "Importing corporate data, take two"
+slug= "handelregister-jsonl"
+date= 2019-03-02T17:25:42+01:00
+lastmod= 2019-03-02T17:25:42+01:00
+tags = [ "Open Data", "Neo4j"]
+layout= "post"
+type=  "post"
+draft= true
+[[resources]]
+  name = "header"
+  src = "img/mms.png"
++++
+
+After link:/2019/02/handelregister-neo4j[my last post], https://twitter.com/mesirii[Michael] contacted me and explained
+that I could simplify the import. The ```apoc.load.json()``` can process JSONL files directly.
+Also, with ```apoc.create.relationship()``` the creation of dynamic relations becomes a lot simpler.
+
+
+=== Identities
+https://twitter.com/opencorporates/[Opencorporates] posted a https://blog.opencorporates.com/2019/02/19/wait-what-the-problems-of-company-numbers-in-germany-and-how-were-handling-them/[blog post]
+recently detailing that the ```native_company_number``` in the German coorperates data is not unique. I previously used these as
+identifiers for the merge command when importing. On second thought, as each company should only occur once
+in the JSONL file, we don't need to merge. So, one less index to create and to maintain for neo4j.
+This, of course, assumes that the import is a one time job.
+
+Dealing with identities is always a problem when working with data: As I don't have any identifying data
+for the ```:Officer```, I used their names. These are very likely not unique, leading to different persons
+represented as the same officer. For my purposes, this is not a problem. For anything real, these issues
+would need to be addressed.
+
+=== Loading JSONL
+As I learned, ```apoc.load.json()``` can load JSONL files directly. No need to split and convert the file.
+The procedure will turn the JSONL file into a stream as it is loaded. In our case, each line is a JSON object
+on its own, so we get a stream of maps.
+In order limit the transaction size, we wrap the call to ```apoc.load.json()``` into a call to ```apoc.periodic.iterate()```
+with the load.json() as first parameter and the cypher query to add/merge the data as second parameter and additional
+options as third parameter:
+[source]
+----
+// run the second statement for each item returned by the first statement.
+// Returns number of batches and total processed rows
+apoc.periodic.iterate('statement returning items', 'statement per item',
+{batchSize:1000,iterateList:true,parallel:false,params:{},concurrency:50,retries:0})
+YIELD batches, total
+----
+
+=== Creating dynamic relationships
+For the relations between officers and companies, I want to use the ```position``` attribute from the json file.
+Unfortunately, cypher does not offer a switch or similar statement, so I used a bit of hack involving ```foreach``` statements
+with only one item if a condition was meet.
+As Michael pointed out, there is an apoc procedure for that too ```apoc.create.relationship()```
+[source]
+----
+// create relationship with dynamic rel-type
+apoc.create.relationship(fromNode,'KNOWS',{key:value,…​}, toNode)
+----
+All that is needed is to uppercase the ```position``` attribute and substitute spaces, so the final command becomes:
+[source]
+----
+call apoc.create.relationship(officer, toUpper(replace(o.position, ' ', '_')),
+    {dismissed:o.other_attributes.dismissed, startDate:date(o.start_date), endDate:date(o.end_date)},company)
+    yield rel
+----
+
+The final import script is much nicer and loads all data in about 10 minutes:
+
+[source]
+----
+call apoc.periodic.iterate("call apoc.load.json('http://localhost:8000/de_companies_ocdata.jsonl') yield value as c",
+"create (company:Company) set company.id = c.company_number, company.name = c.name,
+     company.status = c.current_status, company.jurisdictionCode = c.jurisdiction_code,
+     company.address = c.registered_address, company.registerArt = c.all_attributes._registerArt,
+     company.registerNummer = c.all_attributes._registerNummer,
+     company.registerOffice = c.all_attributes.registered_office,
+     company.nativeCompanyNumber = c.all_attributes.native_company_number,
+     company.previusNames=[p IN c.previous_names | p.company_name],
+     company.federalState = c.all_attributes.federal_state,
+     company.registrar = c.all_attributes.registrar
+
+with c, company UNWIND c.officers as o
+
+merge (officer:Officer {name:o.name}) on create set officer.firstName = o.other_attributes.firstname,
+    officer.lastName = o.other_attributes.lastname, officer.registeredOffice = c.all_attributes.registered_office
+
+with officer, o, company
+
+call apoc.create.relationship(officer, toUpper(replace(o.position, ' ', '_')),
+    {dismissed:o.other_attributes.dismissed, startDate:date(o.start_date), endDate:date(o.end_date)},
+    company) yield rel
+return count(officer)
+", {})
+----
+

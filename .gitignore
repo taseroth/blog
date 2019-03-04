@@ -17,6 +17,7 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
+.DS_Store
 
 ### Go template
 # Binaries for programs and plugins
