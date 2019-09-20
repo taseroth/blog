@@ -1,0 +1,56 @@
+==================================================================
+https://keybase.io/bertradke
+--------------------------------------------------------------------
+
+I hereby claim:
+
+  * I am an admin of https://faboo.org
+  * I am bertradke (https://keybase.io/bertradke) on keybase.
+  * I have a public key ASCc5uQ5gQtpGVnSbntd4_Cj-OhJyFLKS4qRXo8QuIgbvwo
+
+To do so, I am signing this object:
+
+{
+  "body": {
+    "key": {
+      "eldest_kid": "0120df65c8ee67852b38757078d18866eb00de51a3a720226bed40cf6f1baa80e1810a",
+      "host": "keybase.io",
+      "kid": "01209ce6e439810b691959d26e7b5de3f0a3f8e849c852ca4b8a915e8f10b8881bbf0a",
+      "uid": "a95f3962b32df6736f7e84de7b2c8819",
+      "username": "bertradke"
+    },
+    "merkle_root": {
+      "ctime": 1568967972,
+      "hash": "fbc7d969b2212df2f8a3dc92064a9e410b73e32fd3fc255ceba875e0f9aa6c55e3394b8d0641a3c3d375323067fb66b28ef508adb6666f15340d4bb6ccd71e45",
+      "hash_meta": "4f6ed9252a67973cb9c267990432b7a25f4d611e3ec0cd0ccb8436281dfa8ae5",
+      "seqno": 7632332
+    },
+    "service": {
+      "entropy": "dzjERPvfGimRjZO9qTifZ3A9",
+      "hostname": "faboo.org",
+      "protocol": "https:"
+    },
+    "type": "web_service_binding",
+    "version": 2
+  },
+  "client": {
+    "name": "keybase.io go client",
+    "version": "4.5.0"
+  },
+  "ctime": 1568967979,
+  "expire_in": 504576000,
+  "prev": "c825c8c0250467345a2bc0ce2a524726f0a0720c30f76880be866c302bd5fb75",
+  "seqno": 37,
+  "tag": "signature"
+}
+
+which yields the signature:
+
+hKRib2R5hqhkZXRhY2hlZMOpaGFzaF90eXBlCqNrZXnEIwEgnObkOYELaRlZ0m57XePwo/joSchSykuKkV6PELiIG78Kp3BheWxvYWTESpcCJcQgyCXIwCUEZzRaK8DOKlJHJvCgcgww92iAvoZsMCvV+3XEIHDEAvYS82lZM4KUaY2R4jlkP5SVwc16QGhqJ0R559xpAgHCo3NpZ8RAh4xyFig5X+09mlIHVW8DXAKokZs74iL37RfE4SS7N7bpGsTBNefDTo1uVbeqKnV6FKkht4kKNRwpseJgIhMhDqhzaWdfdHlwZSCkaGFzaIKkdHlwZQildmFsdWXEILaUSe2IgFgArGd3xXWe45QmjJa9h0KMmEZ3ByQ2gmy1o3RhZ80CAqd2ZXJzaW9uAQ==
+
+And finally, I am proving ownership of this host by posting or
+appending to this document.
+
+View my publicly-auditable identity here: https://keybase.io/bertradke
+
+==================================================================
