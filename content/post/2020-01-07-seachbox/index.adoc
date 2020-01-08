@@ -21,9 +21,11 @@ A customer asked me recently how to implement a google-like search box. Users sh
 Neo4j indexes have improved significantly with the 3.5 release, and we have all we need available. With an index on the property, a `STARTS WITH` is fast enough for our purpose. For the 2 criteria, we could use a `CONTAINS` operator. But, this is not super fast. Both operators do not support 'sounds like' (spelling error) searches. Ignoring that fact for a moment, how can we achieve the ordering of the results? A simple `UNION` to combine to searches works well: (pseudo code)
 [source]
 ----
-match (n) where n.property STARTS WITH $searchterm return n.property as result order by result limit 5
+match (n:Label) where n.property STARTS WITH $searchterm
+  return n.property as result order by result limit 5
 UNION
-match (n) where n.property contains $searchterm return n.property as result order by result limit 5
+match (n:Label) where n.property contains $searchterm and not STARTS WITH $searchterm
+  return n.property as result order by result limit 5
 ----
 
 But, as mentioned, the second part of the query is not _that_ fast and so far we only have exact search.
@@ -47,16 +49,16 @@ NOTE: Lucene indexes can span multiple Labels and properties.
 How would our search using that index look like?
 [source]
 ----
-match (u:User) where u.description starts with 'data'
+match (u:User) where u.description starts with $searchterm
    return u.name as user, u.description as description order by description limit 5
 UNION
-CALL db.index.fulltext.queryNodes('desc', 'data~') YIELD node, score with node as user, score
+CALL db.index.fulltext.queryNodes('desc', $searchterm+'~') YIELD node, score with node as user, score
   return user.name as user, user.description as description order by score desc limit 5
 ----
 
-The first part uses a Neo4j index to find anything starting with `data` and the second part is doing the fuzzy `contains` search.
+The first part uses a Neo4j index to find anything starting with `$searchterm` and the second part is doing the fuzzy `contains` search.
 
-The result:
+The result when searching for `data`:
 [cols="2,5",options=header,format=csv]
 |===
 user,description
@@ -83,13 +85,13 @@ This calculates a ranking of users and writes the result back as `pagerank` prop
 To use that pagerank, the query now looks like this:
 [source]
 ----
-match (u:User) where u.description starts with 'data'
+match (u:User) where u.description starts with $searchterm
   return u.name as user, u.description as description, u.pagerank as rank order by u.pagerank desc limit 5
 UNION
-CALL db.index.fulltext.queryNodes('desc', 'data~') YIELD node, score with node as user
+CALL db.index.fulltext.queryNodes('desc', $searchterm+'~') YIELD node, score with node as user
  return user.name as user, user.description as description, user.pagerank as rank order by rank desc limit 5
 ----
-Whis gives a much better result:
+Whis gives a much better result (for `data` again):
 [cols="2,5,2",options=header,format=csv]
 |===
 user,description,rank
