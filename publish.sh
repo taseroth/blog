@@ -4,4 +4,4 @@ echo "installing asciidoctor"
 gem install asciidoctor
 
 echo `hugo version`
-hugo
+hugo --gc --minify
