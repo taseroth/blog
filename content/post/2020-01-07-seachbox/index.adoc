@@ -11,14 +11,14 @@ draft= false
 
 +++
 
-A customer asked me recently how to implement a google-like search box. Users should be able to insert a search  string and get a meaningful auto-complete back. The text to search for was coming from a single label / property. Meaningful in the context meant that:
+A customer asked me recently how to implement a google-like search box. Users should be able to insert a search  string and get a meaningful auto-complete back. The text to search for was coming from a single label/property. Meaningful in the context meant that:
 
  * results that start with the search string should come first
  * results that contain the search string should come after the first group
  * relevant results should come first in each group
  * the search should cope with spelling errors
 
-Neo4j indexes have improved significantly with the 3.5 release, and we have all we need available. With an index on the property, a `STARTS WITH` is fast enough for our purpose. For the 2 criteria, we could use a `CONTAINS` operator. But, this is not super fast. Both operators do not support 'sounds like' (spelling error) searches. Ignoring that fact for a moment, how can we achieve the ordering of the results? A simple `UNION` to combine to searches works well: (pseudo code:)
+Neo4j indexes have improved significantly with the 3.5 release, and we have all we need available. With an index on the property, a `STARTS WITH` is fast enough for our purpose. For the 2 criteria, we could use a `CONTAINS` operator. But, this is not super fast. Both operators do not support 'sounds like' (spelling error) searches. Ignoring that fact for a moment, how can we achieve the ordering of the results? A simple `UNION` to combine to searches works well: (pseudo code)
 [source]
 ----
 match (n) where n.property STARTS WITH $searchterm return n.property as result order by result limit 5
@@ -28,9 +28,9 @@ match (n) where n.property contains $searchterm return n.property as result orde
 
 But, as mentioned, the second part of the query is not _that_ fast and so far we only have exact search.
 
-Luckily, Neo4j supports https://neo4j.com/docs/cypher-manual/3.5/schema/index/#schema-index-fulltext-search[full-text search], backed ny Apache Lucene. Lucene provides performant contains searches as well as _fuzzy_ search. Disadvantage: they are not integrated into Cypher, instead one has to work with the `db.index.fulltext.*` group of procedures. Searching for a search term brings back the matched node and score, indicating how relevant Lucene thinks the result is. Unfortunately, I could not find a way to combine a `starts with` search with fuzziness in Lucene.
+Luckily, Neo4j supports https://neo4j.com/docs/cypher-manual/3.5/schema/index/#schema-index-fulltext-search[full-text search], backed by Apache Lucene. Lucene provides performant contains searches as well as _fuzzy_ search. Disadvantage: they are not integrated into Cypher, instead one has to work with the `db.index.fulltext.*` group of procedures. Searching for a search term brings back the matched node and score, indicating how relevant Lucene thinks the result is. Unfortunately, I could not find a way to combine a `starts with` search with fuzziness in Lucene.
 
-To demo the idea, I used data I https://github.com/taseroth/twitter-crawler[parsed from Twitter] for the Neo4j filter bubble. The model ist simple and for our search we only need the `User` Node and the `FOLLOWS` relationship:
+To demo the idea, I used data I https://github.com/taseroth/twitter-crawler[parsed from Twitter] for the Neo4j filter bubble. The model ist simple and for our search, we only need the `User` Node and the `FOLLOWS` relationship:
 [#img-model, role="img-responsive"]
 .Twitter schema
 [link=img/schema.png]
@@ -71,7 +71,7 @@ Brice Richardson,Data | Data | Data. Father of 2.
 Daya Insan Sidhmukh,daya
 |===
 
-So far so good, but what about the relevance criteria? Well, since we are using a graph database, this is easy. Neo4j provides a https://neo4j.com/docs/graph-algorithms/current/[Graph Algorithms] library which allows us to easily calculate a score (relevance) of a node. In this example, I choose the page rank algorithm, using the followers relationships:
+So far so good, but what about the relevance criteria? Well, since we are using a graph database, this is easy. Neo4j provides a https://neo4j.com/docs/graph-algorithms/current/[Graph Algorithms] library which allows us to easily calculate a score (relevance) of a node. In this example, I choose the page rank algorithm, using the `FOLLOWERS` relationships:
 [source]
 ----
 CALL algo.pageRank('User', 'FOLLOWS',
@@ -107,10 +107,10 @@ Aleksander Stensby,"COO at monokkel.io. Software developer, architect and data g
 
 As you can see, Neo4j has the highest relevance in my dataset, but as the description does not start with `data` is comes as number 5.
 
-There are many UI components for a google-like search available, I choose http://easyautocomplete.com/[easyautocomple] as it only needed jQuery as dependency and comes with good documentation.
+There are many UI components for a google-like search available, I choose http://easyautocomplete.com/[easyautocomple] as it only needed jQuery as a dependency and comes with good documentation.
 Even without much configuration, it can use images in the list:
 [#img-autocomplete, role="img-responsive"]
 .Autocomplete example
 image::img/autocomplete.png[Autocomplete example]
 
-The data is provided via a REST endpoint which in turn calls above query. With Spring Boot, this is just a few lines of code. You can check my example on https://github.com/taseroth/searchbox[Github]
+The data is provided via a REST endpoint which in turn calls above query. With Spring Boot, this is just a few lines of code. You can check my example on https://github.com/taseroth/searchbox[Github].
