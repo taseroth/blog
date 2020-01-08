@@ -8,6 +8,7 @@ tags = [ "Neo4j", "Indexing", "Algorithms"]
 layout= "post"
 type=  "post"
 draft= false
+
 +++
 
 A customer asked me recently how to implement a google-like search box. Users should be able to insert a search  string and get a meaningful auto-complete back. The text to search for was coming from a single label / property. Meaningful in the context meant that:
