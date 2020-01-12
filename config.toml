@@ -29,7 +29,8 @@ title = "Bert Radke"
     linkedin = "bert-radke-3a533736"
     twitter = "taseroth"
     stackoverflow = "132270/bert"
-    email = "bert.radke@protonmail.com"
+    email = "bert.radke@pm.me"
+#    keybase = "bertradke"
 
 [permalinks]
   post = "/:year/:month/:slug/"

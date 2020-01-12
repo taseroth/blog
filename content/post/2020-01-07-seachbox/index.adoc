@@ -1,7 +1,7 @@
 +++
 title= "Implementing a Searchbox with Neo4j"
 slug= "implementing-a-searchbox-with-neo4j"
-description = "implementing a google-like searchbox"
+description = "implementing a google-like search box on top of Neo4j with the help of fulltext search and pagerank"
 date= 2020-01-07T20:52:43Z
 lastmod= 2020-01-07T20:52:43Z
 tags = [ "Neo4j", "Indexing", "Algorithms"]
