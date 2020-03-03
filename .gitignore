@@ -34,3 +34,5 @@ fabric.properties
 *.out
 
 /public/
+
+*.DS_Store
