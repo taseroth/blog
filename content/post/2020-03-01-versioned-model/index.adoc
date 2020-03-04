@@ -18,7 +18,7 @@ One recurring question I hear is how to version graph data. Versioning here mean
  * modifying properties on nodes or relationships (add, remove change properties)
  * structural changes (add or removal of nodes and relationships)
 
-Ian Robinson wrote a https://web.archive.org/web/20180530094235/http://iansrobinson.com/category/neo4j/[blog post] about the topic back in 2014. Unfortunately, his blog is deleted and only available via the internet archive. Many of the ideas here are derived from his post. If you prefer watching videos, there is a great https://www.youtube.com/watch?v=Cm1yd8d7qv0&list=PL9Hl4pk2FsvUbsmdPrqTRF_DWvUb4z5AK[talk] from the Nodes 2019 online conference by https://twitter.com/ElLazal[Lju Lazarevic] on that subject.
+Ian Robinson wrote a https://web.archive.org/web/20180530094235/http://iansrobinson.com/category/neo4j/[blog post] about the topic back in 2014. Unfortunately, his blog is deleted and only available via the internet archive. Many of the ideas here are derived from his post. If you prefer watching videos, there is a great https://www.youtube.com/watch?v=Cm1yd8d7qv0&list=PL9Hl4pk2FsvUbsmdPrqTRF_DWvUb4z5AK[talk] from the Nodes 2019 online conference by https://twitter.com/ElLazal[Lju Lazarevic] on that subject. There is also a https://medium.com/neo4j/keeping-track-of-graph-changes-using-temporal-versioning-3b0f854536fa[textual version of that talk], where Lju is also investigating bi-temporal versioning.
 
 There are many different reasons to track changes to the graph and the selected strategy has the fit that needs. Esp, if you want to keep an audit log of changes, the solution will most likely differ from the options discussed here.
 
