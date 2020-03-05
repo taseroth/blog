@@ -50,6 +50,7 @@ Depending on the queries you ask your graph and the frequency at with the relati
 .versioning relationships
 image::img/structureVersioning.svg[versioning relationships]
 In this example, changes to the `qt` attribute lead to a new version of the relationship. Changing the type of relationships leads to expressive and faster queries, but requires more effort when writing. APOCs https://neo4j.com/docs/labs/apoc/current/graph-updates/graph-refactoring/set-relationship-type/[apoc.refactor.rename.type()] can help with rewriting the relationship.
+Modeling the history of a node in a linked list is of particular interest if the state changes often, as Neo4j currently can't index properties on relationships. Ordering / filtering large amount of relationships might become unpractical.
 
 ### Node deletions
 To track deletions of nodes and keep their history, we have to implement some sort of 'soft deletions', e.g. mark them as deleted, but keep them in the graph. Every relationship touching the node needs to be marked as not valid any more (see above). With this, traversals should not reach the node. For the node itself, we have the following options:
@@ -63,3 +64,4 @@ NOTE: Changing the type and labels of the nodes/relationships also allows us to 
 ## Change detection
 
 To keep track of changes in the graph, we need to detect changes. This could be done in application code, but this is error-prone and easy to forget. Another approach is to use Neo4j versions of triggers. These are plugins written in Java and registered with the Neo4j instance at startup. The Neo4j API allows registering https://neo4j.com/docs/java-reference/current/transaction-management/events/[transaction event listeners]. As the name implies, these are part of a transaction and have access to all data changes in the transaction.
+If you are looking for an example implementation, have a look at https://github.com/h-omer/neo4j-versioner-core[neo4j-versioner-core].
