@@ -1,0 +1,76 @@
+[
+  {
+    "topic": "movies",
+    "partition": 0,
+    "offset": 7,
+    "timestamp": 1585056515739,
+    "timestampType": "CREATE_TIME",
+    "headers": [],
+    "key": "742be6d1-d6a2-4963-9fad-68e1ad8a4779",
+    "value": {
+      "payload": {
+        "length": 1,
+        "rels": [
+          {
+            "id": "3",
+            "properties": {
+              "roles": [
+                "Agent Smith"
+              ]
+            },
+            "label": {},
+            "start": {
+              "id": "4",
+              "properties": {
+                "born": 1960,
+                "name": "Hugo Weaving"
+              },
+              "labels": [
+                "Person"
+              ],
+              "type": "node"
+            },
+            "end": {
+              "id": "0",
+              "properties": {
+                "tagline": "Welcome to the Real World",
+                "title": "The Matrix",
+                "released": 1999
+              },
+              "labels": [
+                "Movie"
+              ],
+              "type": "node"
+            },
+            "type": "relationship"
+          }
+        ],
+        "nodes": [
+          {
+            "id": "4",
+            "properties": {
+              "born": 1960,
+              "name": "Hugo Weaving"
+            },
+            "labels": [
+              "Person"
+            ],
+            "type": "node"
+          },
+          {
+            "id": "0",
+            "properties": {
+              "tagline": "Welcome to the Real World",
+              "title": "The Matrix",
+              "released": 1999
+            },
+            "labels": [
+              "Movie"
+            ],
+            "type": "node"
+          }
+        ]
+      }
+    }
+  }
+]
