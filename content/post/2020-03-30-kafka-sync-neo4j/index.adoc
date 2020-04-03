@@ -125,8 +125,6 @@ The schema information is sent along with the cdc data:
 ----
  "schema": {
     "properties": {
-      "number": "Long",
-      "string": "String",
       "name": "String"
     },
     "constraints": [
