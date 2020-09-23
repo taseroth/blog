@@ -7,7 +7,6 @@ lastmod= 2020-09-20T17:40:52+02:00
 tags = [ "GraphQL", "Vue.js", "GRANDstack", "Cognito"]
 layout= "post"
 type=  "post"
-draft= true
 [[resources]]
   name = "feature"
   src = "img/header.png"
