@@ -12,7 +12,7 @@ type=  "post"
   src = "img/header.png"
 +++
 
-In this post, I'm going to look into building a Vue based SPA application, that loads data via graphQL from a Neo4j database. I will describe how to set up the API via GRANDstack, access it from Vue, and secure it via JWT provided from AWS Cognito.
+In this post, I'm going to look into building a Vue based SPA application, that loads data via GraphQL from a Neo4j database. I will describe how to set up the API via GRANDstack, access it from Vue, and secure it via JWT provided from AWS Cognito.
 
 I also used this to teach myself Vue (and to some extend JavaScript) so bear with me if some of the things I do are not 'the JavaScript' way to do it.
 
@@ -31,8 +31,8 @@ Twitter is always a good data source, it is nicely 'graphy' and one can use the 
 In the end, we would have the following components:
 
 * Neo4j database
-* graphQL API listening for HTTP requests and translating between graphQL and Cypher. For now, only read access is provided, not mutations.
-* a SPA (in this case build with Vuejs), sending graphQL queries to the API
+* GraphQL API listening for HTTP requests and translating between GraphQL and Cypher. For now, only read access is provided, not mutations.
+* a SPA (in this case build with Vuejs), sending GraphQL queries to the API
 * AWS Cognito to provide JWTs which will be used in the SPA and API to secure access to resources
 
 Let's get started.
@@ -49,13 +49,13 @@ It will ask a few questions and create the following for us:
 * the React web component in `web-react` , since we are going to use Vue.ja, feel free to delete this directory
 * a `docker-compose.yml` and accompanying `Dockerfile` 's in the relevant subdirectories
 * `.env` files to configure the modules
-* the `scripts` subdirectory contains code to seed a database generate the graphQL schema from a Neo4j database
+* the `scripts` subdirectory contains code to seed a database generate the GraphQL schema from a Neo4j database
 
 We will start with
 
 == The API
 
-is responsible for answering graphQL queries with data from a Neo4j database. It leverages the Apollo server and extends the functionality with the help of the `neo4j-graphql-js` package with resolvers to translate graphQL queries into Cypher queries. The necessary plumbing is already done during the scaffolding process, we will later adjust the configuration in the `src/index.js` file.
+is responsible for answering GraphQL queries with data from a Neo4j database. It leverages the Apollo server and extends the functionality with the help of the `neo4j-graphql-js` package with resolvers to translate GraphQL queries into Cypher queries. The necessary plumbing is already done during the scaffolding process, we will later adjust the configuration in the `src/index.js` file.
 
 Since we are starting with a pre-filled database we will not need the seeding capabilities and can remove them:
 
@@ -67,7 +67,7 @@ api>npm uninstall --save @apollo/client csv-parse react
 Also, note that there is `src/initialize.js` that will be executed at start-up and can be used to create indexes in the database. Check the content, so it does not infer with your schema.
 
 === GraphQL schema
-The most important part of the API is the graphQL schema definition. GRANDstack comes with a script that can inspect a Neo4j database and write that schema file for you:
+The most important part of the API is the GraphQL schema definition. GRANDstack comes with a script that can inspect a Neo4j database and write that schema file for you:
 [source]
 ----
 >npm run inferschema:write
@@ -96,9 +96,9 @@ type User {
 }
 -----
 <1> the Neo4j internal node id, you should normally avoid using these (they will be re-used after deletions)
-<2> `LocalDateTime` is not part of the graphQL spec types, but an addition to work with the Neo4j Date and Time types. We will see later how these get expanded at query time
-<3> In the Neo4j schema, this is an Integer and is filled with IDs coming from the Twitter API. As these can get very large, Twitter recommends to use strings, but the Twitter4J library I use for scrapping is still using `long`. Unfortunately, graphQL can't handle numbers of that size. I had to change that line to `id: String!`. Something to watch out for in your schemas.
-<4> The `@relationship()` annotation allows defining relations between types/nodes, allowing `neo4j-graphql-js` to traverse the graph if a graphQL query requests one the annotated attributes. Can be used to request data from linked types as deep as needed
+<2> `LocalDateTime` is not part of the GraphQL spec types, but an addition to work with the Neo4j Date and Time types. We will see later how these get expanded at query time
+<3> In the Neo4j schema, this is an Integer and is filled with IDs coming from the Twitter API. As these can get very large, Twitter recommends to use strings, but the Twitter4J library I use for scrapping is still using `long`. Unfortunately, GraphQL can't handle numbers of that size. I had to change that line to `id: String!`. Something to watch out for in your schemas.
+<4> The `@relationship()` annotation allows defining relations between types/nodes, allowing `neo4j-graphql-js` to traverse the graph if a GraphQL query requests one the annotated attributes. Can be used to request data from linked types as deep as needed
 <5> To give it more semantic meaning, we will rename this to `mentions`.
 
 We can also add new attributes to a type that get calculated by adding a Cypher query. Say, we want to have a list of the 10 most used Hashtags of a given user. We can achieve this via:
@@ -110,11 +110,11 @@ top10Hashtags: [String] @cypher(statement: """
    return collect(hastag)
    """)
 ----
-Whenever queried, top10Hashtags will contain a list max 10 hashtags, ordered by usage count. The query will only be executed if that attribute is requested by a query. Also, note that each graphQL query is answered by just one cypher query.
+Whenever queried, top10Hashtags will contain a list max 10 hashtags, ordered by usage count. The query will only be executed if that attribute is requested by a query. Also, note that each GraphQL query is answered by just one cypher query.
 
 Running the API, we can start querying it. Tools like *GraphiQL* help in writing queries by examining the provided schema and expanding attributes as need.
 
-NOTE: Running the API via `npm run start:dev` prints the generated Cypher query to the console. Helpful in understanding how the graphQL query gets translated. You may also notice that all graphQL queries, no matter how deeply nested, are translated into a single Cypher query. `neo4j-graphQL-js` uses the https://neo4j.com/labs/apoc/[APOC] plugin for more complex queries, which must be present on the Neo4j server.
+NOTE: Running the API via `npm run start:dev` prints the generated Cypher query to the console. Helpful in understanding how the GraphQL query gets translated. You may also notice that all GraphQL queries, no matter how deeply nested, are translated into a single Cypher query. `neo4j-graphql-js` uses the https://neo4j.com/labs/apoc/[APOC] plugin for more complex queries, which must be present on the Neo4j server.
 
 Querying for the User Neo4j:
 
@@ -255,14 +255,14 @@ image::img/rick-tags.png[Rik van Bruggens tag cloud]
 
 === Adding authentication / authorization
 
-We want our graphQL endpoint to be secured, so only authorized users can access it. GRANDstack authentication via supports https://jwt.io#debugger-io[JSON Web Token] out of the box. The JWT must be provided in an HTTP header `authorization: Bearer <token>`. A token usually contains information about the user such as name, email, id and groups. We can leverage that information to restrict access to graphQL objects via annotations in the schema. The annotations can be placed on:
+We want our GraphQL endpoint to be secured, so only authorized users can access it. GRANDstack authentication via supports https://jwt.io#debugger-io[JSON Web Token] out of the box. The JWT must be provided in an HTTP header `authorization: Bearer <token>`. A token usually contains information about the user such as name, email, id and groups. We can leverage that information to restrict access to GraphQL objects via annotations in the schema. The annotations can be placed on:
 
  * types
  * attributes
  * queries
  * mutations
 
-and restrict access to these. If a query tries to access such a secured resource, an error is returned (graphQL does not use HTTP response codes).
+and restrict access to these. If a query tries to access such a secured resource, an error is returned (GraphQL does not use HTTP response codes).
 
 With the following query definitions, we require all queries to be authenticated and restrict access to the User information to authenticated users:
 [source]
@@ -287,7 +287,7 @@ enum Role { <1>
 ----
 <1> The groups used in the `hasGroup` annotation need to be declared in the schema.
 
-We also need to configure the graphQL server to accept these annotations and parse the HTTP header for the JWT. In `api/src/index.js` the following changes need to be made:
+We also need to configure the GraphQL server to accept these annotations and parse the HTTP header for the JWT. In `api/src/index.js` the following changes need to be made:
 [source, javascript]
 ----
 import {
@@ -325,18 +325,18 @@ const server = new ApolloServer({
 
 The `hasGroup` directive assumes that the group information is stored under the `roles` name in the JWT payload. For AWS Cognito, this is not the case, and we have to provide the key via an environment variables by adding `AUTH_DIRECTIVES_ROLE_KEY=cognito:groups` to the `api/.env` file.
 
-All access to the graphQL queries now need to provide the authorization header.
+All access to the GraphQL queries now need to provide the authorization header.
 
 == Vue
 GRANDstack comes with a preconfigured React application. My particular requirement included building the frontend in https://vuejs.org[Vue].
 
 NOTE: Just after I finished my demo application, https://github.com/vuejs/vue-next/releases/tag/v3.0.0[Vuejs 3.0 One Piece] was announced. The code I show is still based on version 2.
 
-I found the https://www.vuemastery.com[Vue Mastery] video/courses extremely helpful for learning. And as I used the demo to learn Vue, I used some concept that might not be needed for something that simple, esp. Vuex for state management (which a separate module for anything related to twitter data) and Vue router for mounting parts of the application on different URLs. The code for interacting with the graphQL endpoint lives in its own service file. I like to separate concerns and modularise applications.
+I found the https://www.vuemastery.com[Vue Mastery] video/courses extremely helpful for learning. And as I used the demo to learn Vue, I used some concept that might not be needed for something that simple, esp. Vuex for state management (which a separate module for anything related to twitter data) and Vue router for mounting parts of the application on different URLs. The code for interacting with the GraphQL endpoint lives in its own service file. I like to separate concerns and modularise applications.
 
 Vue comes with its own cli, which helps to scaffold the application via: `vue create web-vue` and answering a few questions.
 
-Calling the graphQL API is done through the Apollo client library, which of version 3 can be used without loading all of React into the application:
+Calling the GraphQL API is done through the Apollo client library, which of version 3 can be used without loading all of React into the application:
 
 [source, javascript]
 ----
@@ -396,7 +396,7 @@ The needed dependencies can be added to the Vue project via `npm install -save a
 
 NOTE: Adding the amplify dependencies to our Vue app will increase the JavaScript to be loaded by the browser by over *6MB*. I used operation systems smaller than that. Sorry, ranting again. But for basically just sending a few HTTP requests, amplify seems *slightly* over-complicated. It probably provides way more functionality, but I could not find a slimmed-down version providing just that.
 
-The sample application does not provide user-sign-on, so I created a user manually in the Cognito console, also created a `group1` group and added the user to it, so we can see if the group check on the graphQL API works as expected.
+The sample application does not provide user-sign-on, so I created a user manually in the Cognito console, also created a `group1` group and added the user to it, so we can see if the group check on the GraphQL API works as expected.
 
 Users created in Cognito start in a state that requires them to change their password, which is good practice for a production system, but represented me with the problem on how to activate the user. The amplify documentation did not provide information on the flow of API calls to use, so I ended up temporarily adding the amplify-vue component just to change the password once.
 Again: Cognito and amplify are probably great if you want to secure access to all your AWS services. But it comes with a significant learning investment that is not justified if all you need is a simple JWT token.
@@ -422,7 +422,7 @@ Both, `signIn()` and `signOut()` return promises, which makes using them in mode
 
 
 == Round-up
-Coming from a Java and REST background, I did have some reservations about graphQL, but the flexibility it offers to the client and the ease of use provided by GRANDstack did surprise me.
-One could probably go even a step further and use the React-graphQL or Vue-graphQL components, but I'm not yet ready to put (data)-queries into UI components.
+Coming from a Java and REST background, I did have some reservations about GraphQL, but the flexibility it offers to the client and the ease of use provided by GRANDstack did surprise me.
+One could probably go even a step further and use the React-GraphQL or Vue-GraphQL components, but I'm not yet ready to put (data)-queries into UI components.
 
 Building the demo application was fun, you can check out the code at https://github.com/taseroth/twitter-gvandstack[Github]. I might even add more features in the future.
