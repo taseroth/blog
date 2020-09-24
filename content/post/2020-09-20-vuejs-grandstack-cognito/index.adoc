@@ -14,7 +14,7 @@ type=  "post"
 
 In this post, I'm going to look into building a Vue based SPA application, that loads data via GraphQL from a Neo4j database. I will describe how to set up the API via GRANDstack, access it from Vue, and secure it via JWT provided from AWS Cognito.
 
-I also used this to teach myself Vue (and to some extend JavaScript) so bear with me if some of the things I do are not 'the JavaScript' way to do it.
+I also used this to teach myself Vue (and to some extent JavaScript) so bear with me if some of the things I do are not 'the JavaScript' way to do it.
 
 You can explore the demo application on https://github.com/taseroth/twitter-gvandstack[Github]
 
@@ -112,7 +112,7 @@ top10Hashtags: [String] @cypher(statement: """
 ----
 Whenever queried, top10Hashtags will contain a list max 10 hashtags, ordered by usage count. The query will only be executed if that attribute is requested by a query. Also, note that each GraphQL query is answered by just one cypher query.
 
-Running the API, we can start querying it. Tools like *GraphiQL* help in writing queries by examining the provided schema and expanding attributes as need.
+Running the API, we can start querying it. Tools like *GraphiQL* help in writing queries by examining the provided schema and expanding attributes as needed.
 
 NOTE: Running the API via `npm run start:dev` prints the generated Cypher query to the console. Helpful in understanding how the GraphQL query gets translated. You may also notice that all GraphQL queries, no matter how deeply nested, are translated into a single Cypher query. `neo4j-graphql-js` uses the https://neo4j.com/labs/apoc/[APOC] plugin for more complex queries, which must be present on the Neo4j server.
 
@@ -264,7 +264,7 @@ We want our GraphQL endpoint to be secured, so only authorized users can access 
 
 and restrict access to these. If a query tries to access such a secured resource, an error is returned (GraphQL does not use HTTP response codes).
 
-With the following query definitions, we require all queries to be authenticated and restrict access to the User information to authenticated users:
+With the following query definitions, we require all queries to be authenticated and to restrict access to the User information for authenticated users:
 [source]
 ----
 type Query {
@@ -332,7 +332,7 @@ GRANDstack comes with a preconfigured React application. My particular requireme
 
 NOTE: Just after I finished my demo application, https://github.com/vuejs/vue-next/releases/tag/v3.0.0[Vuejs 3.0 One Piece] was announced. The code I show is still based on version 2.
 
-I found the https://www.vuemastery.com[Vue Mastery] video/courses extremely helpful for learning. And as I used the demo to learn Vue, I used some concept that might not be needed for something that simple, esp. Vuex for state management (which a separate module for anything related to twitter data) and Vue router for mounting parts of the application on different URLs. The code for interacting with the GraphQL endpoint lives in its own service file. I like to separate concerns and modularise applications.
+I found the https://www.vuemastery.com[Vue Mastery] video/courses extremely helpful for learning. And as I used the demo to learn Vue, I may have used concepts that might not be needed for something that simple, esp. Vuex for state management (which a separate module for anything related to twitter data) and Vue router for mounting parts of the application on different URLs. The code for interacting with the GraphQL endpoint lives in its own service file. I like to separate concerns and modularise applications.
 
 Vue comes with its own cli, which helps to scaffold the application via: `vue create web-vue` and answering a few questions.
 
