@@ -61,8 +61,8 @@ The GTFS documentation on routes.txt and service_id is not very clear, so I will
 The geo-information on the stops is stored as Neo4j Point type, allowing the usage of https://github.com/stellasia/neomap[NeoMap] inside of Neo4j Desktop to quickly verify the locations of the imported Stops:
 [#img-neomap, role="img-responsive"]
 .NeoMap displaying stops
-[link=img/neomap_small.png]
-image::img/neomap_large.png[NeoMap displaying stops]
+[link=img/neomap_large.png]
+image::img/neomap_small.png[NeoMap displaying stops]
 
 This will also alert us that there is at least one stop with incorrect latitude/longitude information (at 0/0). Something to be aware of when we are starting to use the location information.
 
