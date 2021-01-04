@@ -1,0 +1,52 @@
+{
+  "title": "UK-GTFS ⚡",
+  "version": "1.0",
+  "editable": true,
+  "reports": [
+    {
+      "title": "Stops by [:STOPS_AT] count",
+      "width": 12,
+      "height": 4,
+      "type": "bar",
+      "query": "match (s:Stop)<-[r:STOPS_AT]-() with s.id as g, count(r) as cnt\nwith max(cnt) as max, min(cnt) as min\nwith reverse(range (min, max, (max-min)/30)) as buckets\nunwind range(0, size(buckets)-2) as i\nmatch (s:Stop)<-[r:STOPS_AT]-() with buckets, i, s.id as g, count(r) as cnt where buckets[i]>= cnt > buckets[i+1]\nreturn buckets[i] as Trips, count(g) as Stops\n",
+      "page": 28,
+      "properties": [],
+      "parameters": "",
+      "refresh": 0
+    },
+    {
+      "title": "Trips per ServiceId",
+      "width": 12,
+      "height": 4,
+      "type": "bar",
+      "query": "match (t:Trip) with t.serviceId as sid, count(t) as cnt\nwith max(cnt) as max, min(cnt) as min\nwith reverse(range (min, max, (max-min)/20)) as buckets\nunwind range(0, size(buckets)-2) as i\nmatch (t:Trip) with buckets, i, t.serviceId as sid, count(t) as cnt where buckets[i] >= cnt > buckets[i+1]\nreturn buckets[i] as Trips, count(sid) as Service",
+      "page": 16,
+      "properties": [],
+      "parameters": "",
+      "refresh": 0
+    },
+    {
+      "title": "Top Stops by [:STOPS_AT]",
+      "width": 4,
+      "height": 4,
+      "type": "table",
+      "query": "match (s:Stop)<-[r:STOPS_AT]-() return s.code, count(r) as cnt order by cnt desc limit 10\n",
+      "page": 1,
+      "properties": [],
+      "parameters": "",
+      "refresh": 0
+    },
+    {
+      "title": "Trips with equal set of stops",
+      "width": 6,
+      "height": 4,
+      "type": "table",
+      "query": "match (t:Trip)<-[:BELONGS_TO]-()-[:STOPS_AT]->(s) with {trip : t.id, stops : collect(s.code)} as trips\nwith trips.stops as stops, collect(trips.trip) as trips where size(trips) > 5\nreturn stops, trips order by size(stops) desc limit 10",
+      "page": 1,
+      "properties": [],
+      "parameters": "",
+      "refresh": 0
+    },
+    {}
+  ]
+}
