@@ -23,7 +23,7 @@
           <br/>
           {{ $subtotal := sub $total 1 }} <i class="icon icon-tags"></i>
           {{ range $i, $tag := . }}
-          <a class="badge badge-tag" href="{{ "/tags/" | relURL }}{{ $tag | urlize }}">{{ $tag | lower }}</a>
+          <a class="badge badge-tag" href="{{ "/tags/" | relURL }}{{ $tag | urlize }}">{{ $tag }}</a>
           {{ if lt $i $subtotal }} {{ end }}
       {{ end }}
     {{ end }}
