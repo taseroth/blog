@@ -7,7 +7,7 @@ lastmod= 2021-01-05T10:29:26+01:00
 tags = [ "Neo4j", "Graph-Traversal", "Plugin"]
 layout= "post"
 type=  "post"
-draft= true
+draft= false
 [[resources]]
   name = "feature"
   src = "img/header.png"
