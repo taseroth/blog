@@ -1,0 +1,138 @@
++++
+title= "Neo4j Traversal API"
+slug= "neo4j-traversal-api"
+description = "Introduction to the Neo4j traversal API"
+date= 2021-01-05T10:29:26+01:00
+lastmod= 2021-01-05T10:29:26+01:00
+tags = [ "Neo4j", "Graph-Traversal", "Plugin"]
+layout= "post"
+type=  "post"
+draft= true
+[[resources]]
+  name = "feature"
+  src = "img/header.png"
++++
+
+Neo4j's https://neo4j.com/docs/cypher-refcard/current/[Cypher] is a powerful query language to work with connected data. If the provided functionality is not enough, then there is https://neo4j.com/labs/apoc/[APOC] to fill in the missing bits. I recommend to try and stay with Cypher and APOC as much as possible. Sometimes, https://faboo.org/2021/01/loading-uk-gtfs/[the rules are too complex] to express in Cypher and we need to use the Java API.
+
+The Java API is available to Neo4j plugins, which implies that you package your code in a `.jar` and deploy it inside the `/plugin/` folder of your Neo4j installation. This also means that you need to restart Neo4j to change the plugin.
+
+The https://github.com/neo4j-examples/neo4j-procedure-template[neo4j-procedure-template] is a good starting point as it contains examples and maven pom file that builds a jar file ready for deployment.
+
+Part of the Java API is the https://neo4j.com/docs/java-reference/current/traversal/[Traversal framework] that allows describing the traversal (query) you want to perform and then let the framework handle the actual work.
+
+The framework is single-threaded, simplifies the usage. Given the assumption that in a typical database usage multiple users are performing queries, the single-thread approach should still utilize the power of modern CPUs.
+
+NOTE: There is a big red depreciation warning on the traversal API. While it is true that there are plans to remove the current API, there is no replacement yet and it is save to assume that the API will be available at least for the next major release.
+
+To explain the concepts and components involved, I will be using the following sample graph. While this graph is simple and does warrant the use of a plugin, I hope it will serve to illustrate how to use the API.
+
+[#img-schema, role="img-responsive"]
+.sample graph
+image::img/sample_graph.png[sample graph]
+
+== Traversal description
+
+The traversal always starts with one or more start nodes, and we can configure how to expand from each node (which relationships to follow). For this, each traversal has one Expander/PathExpander configured, that is called at each node.
+The traversal than needs to know which nodes (actually the path leading to that node) should be part of the result set.
+The traversal can optionally also take care not to visit nodes/relationships more than ones.
+
+Let's assume that, starting from the red A nodes, we want to collect at least 2 green C nodes. We would first need to construct our traversal configuration (aka TraversalDescription):
+
+[source, java]
+----
+TraversalDescription traverseDescription = db.beginTx().traversalDescription() <1>
+    .uniqueness(NODE_GLOBAL) <2>
+    .breadthFirst() <3>
+    .expandand(new AllExpander()) <4>
+    .evaluationluator(new GreenEvaluator(minimumGreen)) <5>
+----
+
+<1> we obtain a traversal description from a transaction, so we can modify it
+<2> set the https://neo4j.com/docs/java-reference/current/traversal/#traversal-java-api-uniqueness[uniqueness] to the default value
+<3> breadth-first or depth-first, see below
+<4> set an Expander that returns relationships to follow for each node
+<5> we configure an Evaluator that determines if a path should be collected into the result and if traversal for this *branch* should continue.
+
+After the configuration of the traversal, the traversal can be started by passing one or more start nodes. The returned Traverser object than has methods to access the result.
+
+[source, java]
+----
+Traverser traverser = traverseDescription.traverse(startNodes);
+----
+
+== Expander/PathExpander
+For each step (node) in the traversal, we get to decide how to expand, aka, which relationships to follow. For this, the TraversalDescription has exactly one Expander configured. A sample implementation could look like this:
+[source, java]
+----
+public class AllExpander implements PathExpander<Integer> {
+
+    @Override
+    public Iterable<Relationship> expandand(Path path, BranchState<Integer> state) {
+        return path.endNode().getRelationships(Direction.OUTGOING);
+    }
+}
+----
+There is one function `expandand()` that needs to be implemented (there is also `reverse()` that needs to be there, but we can rust return `null` there). The API provides a few implementations of the `PathExpander` interface in `PathExpanders`:
+
+* allTypesAndDirections()
+* forType()
+* forTypeAndDirection()
+
+so for simple cases (as in the example above), there is no need to implement them.
+
+There is also the option to pass state along using the type parameter of the interface. This state can be any object but is only passed 'down' the traversal. Changes further down in the branch will not be accessible at the parent branch.
+
+== Order
+The order determines which of the relationships returned from an Expander are traverse next. This is configured by passing an implementation of the `BranchOrderingPolicy` interface to the TraversalDescription via the `order()` call. The API comes with 2 implementations:
+
+=== Depth-First
+Expanding and evaluating children of a node first before the siblings of a node. In our example graph, the traversal would look like the following (the first column describes if the row is the expand step or evaluation step):
+[format="csv", separator=":", width="50%", options=header]
+|====
+Phase : Path
+evaluationluation	: (A1)
+evaluationluation	: (A2)
+expandand	: (A1)
+evaluationluation	: (A1)-[RELATED]-(B3)
+expandand	: (A1)-[RELATED]-(B3)
+evaluationluation	: (A1)-[RELATED]-(B3)-[RELATED]-(C1)
+expandand	: (A1)-[RELATED]-(B3)-[RELATED]-(C1)
+evaluationluation	: (A1)-[RELATED]-(B2)
+expandand	: (A1)-[RELATED]-(B2)
+evaluationluation	: (A1)-[RELATED]-(B2)-[RELATED]-(C2)
+expandand	: (A1)-[RELATED]-(B2)-[RELATED]-(C2)
+evaluationluation	: (A1)-[RELATED]-(B2)-[RELATED]-(C4)
+expandand	: (A1)-[RELATED]-(B2)-[RELATED]-(C4)
+evaluationluation	: (A1)-[RELATED]-(B1)
+expandand	: (A1)-[RELATED]-(B1)
+evaluationluation	: (A1)-[RELATED]-(B1)-[RELATED]-(C3)
+expandand	: (A1)-[RELATED]-(B1)-[RELATED]-(C3)
+expandand	: (A2)
+|====
+=== Breath-First
+Not to be confused with https://xkcd.com/2407/[bread first], this will first go for the siblings of a node before following 'down' to the children:
+[format="csv", separator=":", width="50%", options=header]
+|====
+Phase : Path
+evaluation	: (A1)
+evaluation	: (A2)
+expand	: (A1)
+expand	: (A2)
+evaluation	: (A1)-[RELATED]-(B3)
+evaluation	: (A1)-[RELATED]-(B2)
+evaluation	: (A1)-[RELATED]-(B1)
+evaluation	: (A2)-[RELATED]-(C4)
+expand	: (A1)-[RELATED]-(B3)
+evaluation	: (A1)-[RELATED]-(B3)-[RELATED]-(C1)
+expand	: (A1)-[RELATED]-(B2)
+evaluation	: (A1)-[RELATED]-(B2)-[RELATED]-(C2)
+expand	: (A1)-[RELATED]-(B1)
+evaluation	: (A1)-[RELATED]-(B1)-[RELATED]-(C3)
+expand	: (A2)-[RELATED]-(C4)
+expand	: (A1)-[RELATED]-(B3)-[RELATED]-(C1)
+expand	: (A1)-[RELATED]-(B2)-[RELATED]-(C2)
+expand	: (A1)-[RELATED]-(B1)-[RELATED]-(C3)
+|====
+
+Complete source code of the example above together with a simple test can be found in the https://github.com/taseroth/gtfs-routing[repository] in the `org.faboo.example.traversal` package.
