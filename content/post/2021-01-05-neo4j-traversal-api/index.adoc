@@ -65,11 +65,22 @@ Traverser traverser = traverseDescription.traverse(startNodes);
 For each step (node) in the traversal, we get to decide how to expand, aka, which relationships to follow. For this, the TraversalDescription has exactly one Expander configured. A sample implementation could look like this:
 [source, java]
 ----
-public class AllExpander implements PathExpander<Integer> {
+public static class AllExpander implements PathExpander<List<String>> {
 
     @Override
-    public Iterable<Relationship> expandand(Path path, BranchState<Integer> state) {
+    public Iterable<Relationship> expand(Path path, BranchState<List<String>> branchState) {
+              PathLogger.logPath(path, "exp", branchState);
+            // expand along all relationships
+            // there is a ALLExpander provided, this is here to show the interface
+        final ArrayList<String> newState = new ArrayList<>(branchState.getState());
+        newState.add((String)path.endNode().getProperty("name"));
+        branchState.setState(newState);
         return path.endNode().getRelationships(Direction.OUTGOING);
+    }
+
+    @Override
+    public PathExpander<List<String>> reverse() {
+        return null;
     }
 }
 ----
@@ -81,58 +92,86 @@ There is one function `expandand()` that needs to be implemented (there is also 
 
 so for simple cases (as in the example above), there is no need to implement them.
 
-There is also the option to pass state along using the type parameter of the interface. This state can be any object but is only passed 'down' the traversal. Changes further down in the branch will not be accessible at the parent branch.
+There is also the option to pass state along using the type parameter of the interface.
+
+== State
+The traversal API can move state along. The `BranchState` is accessible from `PathExpanders` as well as from the `PathEvaluator`. Changes to the state are only visible 'downstream'. Usage of that state can greatly simplify the design of your traversal logic.
+
+NOTE: The traversal API has the notion of *Branch*. Whenever the API follows a relationship form a node (A) to a node (B), a new branch is created. The branch for B has the branch A as a parent. State is only passed from parent to child, not the other way around.
+
+You can see how the state changes during the traversal in the tables below.
+
 
 == Order
 The order determines which of the relationships returned from an Expander are traverse next. This is configured by passing an implementation of the `BranchOrderingPolicy` interface to the TraversalDescription via the `order()` call. The API comes with 2 implementations:
 
 === Depth-First
-Expanding and evaluating children of a node first before the siblings of a node. In our example graph, the traversal would look like the following (the first column describes if the row is the expand step or evaluation step):
-[format="csv", separator=":", width="50%", options=header]
+Expanding and evaluating children of a node first before the siblings of a node. In our example graph, the traversal would look like the following:
+
+[width="80%",frame=none,border=none,stripe=none, cols=",<.<a"]
 |====
-Phase : Path
-evaluationluation	: (A1)
-evaluationluation	: (A2)
-expandand	: (A1)
-evaluationluation	: (A1)-[RELATED]-(B3)
-expandand	: (A1)-[RELATED]-(B3)
-evaluationluation	: (A1)-[RELATED]-(B3)-[RELATED]-(C1)
-expandand	: (A1)-[RELATED]-(B3)-[RELATED]-(C1)
-evaluationluation	: (A1)-[RELATED]-(B2)
-expandand	: (A1)-[RELATED]-(B2)
-evaluationluation	: (A1)-[RELATED]-(B2)-[RELATED]-(C2)
-expandand	: (A1)-[RELATED]-(B2)-[RELATED]-(C2)
-evaluationluation	: (A1)-[RELATED]-(B2)-[RELATED]-(C4)
-expandand	: (A1)-[RELATED]-(B2)-[RELATED]-(C4)
-evaluationluation	: (A1)-[RELATED]-(B1)
-expandand	: (A1)-[RELATED]-(B1)
-evaluationluation	: (A1)-[RELATED]-(B1)-[RELATED]-(C3)
-expandand	: (A1)-[RELATED]-(B1)-[RELATED]-(C3)
-expandand	: (A2)
+| image:img/sample_graphDF.png[role=left] |
+Traversal always starts with provided starting nodes, in our case A1 and A2. Before expansion, the node is evaluated and depending on the return value of the `PathEvaluator` the expander will be called.
+
+. A1 is evaluated and expanded. A1 is added to the branch state
+. after evaluation of B3, expansion and evaluation of C1. Note that the state has A1 and B3
+. B3 has no more children branches, so the next child of A1 is evaluated. The state only has A1 in it, as B3 was added in a child state
+. Evaluation of C2
+. Evaluation of C4. The state for this and the last step are the same, as the parent is the same
+. Evaluation of C3. The state reflects the parents B1 and A1
+. Evaluation of A2. There is an expand step (the very last in the table), but since we have evaluated B2 and C4 already and the uniques was set to `NODE_GLOBAL`, no further evaluation is taking place
+. evaluation of B1 (I forgot to number it..), it should bo between 6 and 7
+
 |====
+
+[format="csv", cols="^1,^1,<3", separator=":", width="50%", options=header]
+|====
+Phase : State : Path
+evaluation	: [] 	:(A1)
+evaluation	: [] 	:(A2)
+expand	: [] 	:(A1)
+evaluation	: [A1] 	:(A1)-[RELATED]-(B3)
+expand	: [A1] 	:(A1)-[RELATED]-(B3)
+evaluation	: [A1, B3] 	:(A1)-[RELATED]-(B3)-[RELATED]-(C1)
+expand	: [A1, B3] 	:(A1)-[RELATED]-(B3)-[RELATED]-(C1)
+evaluation	: [A1] 	:(A1)-[RELATED]-(B2)
+expand	: [A1] 	:(A1)-[RELATED]-(B2)
+evaluation	: [A1, B2] 	:(A1)-[RELATED]-(B2)-[RELATED]-(C2)
+expand	: [A1, B2] 	:(A1)-[RELATED]-(B2)-[RELATED]-(C2)
+evaluation	: [A1, B2] 	:(A1)-[RELATED]-(B2)-[RELATED]-(C4)
+expand	: [A1, B2] 	:(A1)-[RELATED]-(B2)-[RELATED]-(C4)
+evaluation	: [A1] 	:(A1)-[RELATED]-(B1)
+expand	: [A1] 	:(A1)-[RELATED]-(B1)
+evaluation	: [A1, B1] 	:(A1)-[RELATED]-(B1)-[RELATED]-(C3)
+expand	: [A1, B1] 	:(A1)-[RELATED]-(B1)-[RELATED]-(C3)
+expand	: [] 	:(A2)
+|====
+
 === Breath-First
 Not to be confused with https://xkcd.com/2407/[bread first], this will first go for the siblings of a node before following 'down' to the children:
-[format="csv", separator=":", width="50%", options=header]
+[format="csv", cols="^1,^1,<3", separator=":", width="50%", options=header]
 |====
-Phase : Path
-evaluation	: (A1)
-evaluation	: (A2)
-expand	: (A1)
-expand	: (A2)
-evaluation	: (A1)-[RELATED]-(B3)
-evaluation	: (A1)-[RELATED]-(B2)
-evaluation	: (A1)-[RELATED]-(B1)
-evaluation	: (A2)-[RELATED]-(C4)
-expand	: (A1)-[RELATED]-(B3)
-evaluation	: (A1)-[RELATED]-(B3)-[RELATED]-(C1)
-expand	: (A1)-[RELATED]-(B2)
-evaluation	: (A1)-[RELATED]-(B2)-[RELATED]-(C2)
-expand	: (A1)-[RELATED]-(B1)
-evaluation	: (A1)-[RELATED]-(B1)-[RELATED]-(C3)
-expand	: (A2)-[RELATED]-(C4)
-expand	: (A1)-[RELATED]-(B3)-[RELATED]-(C1)
-expand	: (A1)-[RELATED]-(B2)-[RELATED]-(C2)
-expand	: (A1)-[RELATED]-(B1)-[RELATED]-(C3)
+Phase : State : Path
+evaluation	: [] 	:(A1)
+evaluation	: [] 	:(A2)
+expand	: [] 	:(A1)
+expand	: [] 	:(A2)
+evaluation	: [A1] 	:(A1)-[RELATED]-(B3)
+evaluation	: [A1] 	:(A1)-[RELATED]-(B2)
+evaluation	: [A1] 	:(A1)-[RELATED]-(B1)
+evaluation	: [A2] 	:(A2)-[RELATED]-(C4)
+expand	: [A1] 	:(A1)-[RELATED]-(B3)
+evaluation	: [A1, B3] 	:(A1)-[RELATED]-(B3)-[RELATED]-(C1)
+expand	: [A1] 	:(A1)-[RELATED]-(B2)
+evaluation	: [A1, B2] 	:(A1)-[RELATED]-(B2)-[RELATED]-(C2)
+expand	: [A1] 	:(A1)-[RELATED]-(B1)
+evaluation	: [A1, B1] 	:(A1)-[RELATED]-(B1)-[RELATED]-(C3)
+expand	: [A2] 	:(A2)-[RELATED]-(C4)
+expand	: [A1, B3] 	:(A1)-[RELATED]-(B3)-[RELATED]-(C1)
+expand	: [A1, B2] 	:(A1)-[RELATED]-(B2)-[RELATED]-(C2)
+expand	: [A1, B1] 	:(A1)-[RELATED]-(B1)-[RELATED]-(C3)
 |====
+
+I used a list of node names as an example only. You can use the state to pass a calculated weight, costs, counters or complex data structures along.
 
 Complete source code of the example above together with a simple test can be found in the https://github.com/taseroth/gtfs-routing[repository] in the `org.faboo.example.traversal` package.
