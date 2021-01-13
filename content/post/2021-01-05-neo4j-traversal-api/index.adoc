@@ -120,7 +120,7 @@ Traversal always starts with provided starting nodes, in our case A1 and A2. Bef
 . Evaluation of C4. The state for this and the last step are the same, as the parent is the same
 . Evaluation of C3. The state reflects the parents B1 and A1
 . Evaluation of A2. There is an expand step (the very last in the table), but since we have evaluated B2 and C4 already and the uniques was set to `NODE_GLOBAL`, no further evaluation is taking place
-. evaluation of B1 (I forgot to number it..), it should bo between 6 and 7
+. evaluation of B1 (I forgot to number it..), it should go between 6 and 7
 
 |====
 
