@@ -8,5 +8,6 @@ PLATFORMS
 
 DEPENDENCIES
   asciidoctor
-  bundler (>=  2.1.4)
 
+BUNDLED WITH
+   2.3.5
