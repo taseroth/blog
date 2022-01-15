@@ -1,6 +1,6 @@
 [build]
 publish = "public"
-command = "gem install asciidoc asciidoctor && hugo --gc --minify"
+command = "gem install asciidoctor && hugo --gc --minify"
 
 [context.production.environment]
 HUGO_VERSION = "0.92.0"
