@@ -16,7 +16,7 @@ draft= false
 In this post, I will discuss Neo4j Plugins, what they are, how they work and when you should consider them. And also when you should not use them. This is the long-text version of my lighting talk at https://neo4j.com/nodes-2022/[Nodes 2022]. I realised that 10-15 minutes are way too short to explain all that I wanted to explain.
 
 == What are plugins and how do I use them
-Neo4j plugins are Java jar files that reside inside the `/plugins/` folder of a Neo4j installation. At startup, Neo4j scans `*.jar` files in that directory and adds annotated code to the available functionality in the database.
+Neo4j plugins are Java classes packaged as jar files that reside inside the `/plugins/` folder of a Neo4j installation. At startup, Neo4j scans `*.jar` files in that directory and adds annotated code to the available functionality in the database.
 
 Code inside plugins gets executed inside the same JVM as the database itself and therefore has the same privileges as the database. Plugins also share the resources with the database, so care must be taken with the usage of threads and memory.
 
@@ -25,9 +25,9 @@ An example of a user-defined procedure declaration:
 [source,java]
 ----
 
-    @Procedure(value = "example.getRelationshipTypes", mode = Mode.READ)  <1> <2>
-    @Description("Get the different relationships going in and out of a node.") <3>
-    public Stream<RelationshipTypes> getRelationshipTypes(@Name("node") Node node) { <4> <5>
+    @Procedure("example.getRelationshipTypes", mode = Mode.READ) // <1> <2>
+    @Description("Get the different relationships going in and out of a node.") // <3>
+    public Stream<RelationshipTypes> getRelationshipTypes(@Name("node") Node node) { // <4> <5>
 
 ----
 <1> The `value` defines the name under which the procedure can be called. Dot separated namespaces are supported.
@@ -118,13 +118,13 @@ return collect(movie.title)
 into Java:
 [source,java]
 ----
-var hanks = tx.findNode(Label.label("Person"), "name", "Tom Hanks"); <1>
+var hanks = tx.findNode(Label.label("Person"), "name", "Tom Hanks"); // <1>
 return StreamSupport.stream( <2>
-           hanks.getRelationships(Direction.OUTGOING, RelationshipType.withName("DIRECTED")) <3>
+           hanks.getRelationships(Direction.OUTGOING, RelationshipType.withName("DIRECTED")) // <3>
        .spliterator(), false)
-             .map(Relationship::getEndNode) <4>
-             .map(movie -> movie.getProperty("title")) <5>
-             .collect(Collectors.toSet()); <6>
+             .map(Relationship::getEndNode) // <4>
+             .map(movie -> movie.getProperty("title")) // <5>
+             .collect(Collectors.toSet()); // <6>
 ----
 <1> Find the `:Person` node by `name` attribute. This throws an exception if more then one node is found and returns `null` if no such node exists. This will use an index if it exists.
 <2> Turn the `iterable` into a Java stream for ease of processing.
@@ -146,9 +146,9 @@ Plugins can start new threads to process and traverse the graph in parallel if n
 To circumvent that problem, pass the internal Id of the entity to new threads:
 [source,java]
 ----
-var nodeId = node.getId(); <1>
+var nodeId = node.getId(); // <1>
 
-var node = tx.getNodeById(nodeId); <2>
+var node = tx.getNodeById(nodeId); // <2>
 ----
 <1> Get the internal Id of the node. This will be a `long`.
 <2> Retrieve the node by its internal Id in the other thread/transaction. Since these Ids are pointers into the store, this will not incur an observable performance penalty.
@@ -171,7 +171,7 @@ The callbacks will receive the changes contained in the transaction and can act 
 
 Transaction event handlers can be problematic in a clustered environment and should be avoided if possible.
 
-== How can to test plugins
+== How to test plugins
 
 The Neo4j test harness provides an easy way to test your procedures and functions. It integrates with https://junit.org/junit5/[JUnit] and allows to start an embedded Neo4j for testing. The typical setup is as follows:
 
@@ -184,19 +184,19 @@ Annotated example from the https://github.com/neo4j-examples/neo4j-procedure-tem
 
 [source,java]
 ----
-@TestInstance(TestInstance.Lifecycle.PER_CLASS) <1>
+@TestInstance(TestInstance.Lifecycle.PER_CLASS) // <1>
 public class JoinTest {
 
-    private static final Config driverConfig = Config.builder().withoutEncryption().build(); <2>
+    private static final Config driverConfig = Config.builder().withoutEncryption().build(); // <2>
     private Neo4j embeddedDatabaseServer;
 
     @BeforeAll
     void initializeNeo4j() {
-        this.embeddedDatabaseServer = Neo4jBuilders.newInProcessBuilder() <3>
-                .withDisabledServer() <4>
-                .withFunction(Join.class) <5>
-                .withFixture(..) <6>
-                .build(); <7>
+        this.embeddedDatabaseServer = Neo4jBuilders.newInProcessBuilder() // <3>
+                .withDisabledServer() // <4>
+                .withFunction(Join.class) // <5>
+                .withFixture(..) // <6>
+                .build(); // <7>
     }
 ----
 <1> Tells JUnit to create one instance per test class.
@@ -212,10 +212,10 @@ A typical test case would look similar to this:
 ----
 @Test
 void joinsStrings() {
-    try(Driver driver = GraphDatabase.driver(embeddedDatabaseServer.boltURI(), driverConfig); <1>
-        Session session = driver.session()) { <2>
+    try(Driver driver = GraphDatabase.driver(embeddedDatabaseServer.boltURI(), driverConfig); // <1>
+        Session session = driver.session()) { // <2>
 
-        var result = session.run("CALL our.procedure()"); <3>
+        var result = session.run("CALL our.procedure()"); // <3>
     }
 }
 ----
