@@ -34,3 +34,4 @@ fabric.properties
 *.out
 
 /public/
+/node_modules/

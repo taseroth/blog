@@ -17,8 +17,11 @@ Times changed fast and by now I have programmed in languages ranging from C/C++ 
 (and Oracle Forms, double yuck!), TypeScript and are currently Java for a wide variety of fields including
 the semiconductor industry, energy trading, logistics and health care.
 
+
 In recent years, I have given a few talks at local community events, mostly with my
 friend https://twitter.com/magomi[Marco]. I'm by no means an experienced speaker, but, surprisingly, I enjoy presenting.
+
+Outside of work, I love to go hiking or more recently bikepacking. The picture at the top of the articles have mostly been taking while cycling.
 
 **This blog** is managed by https://hugo.io[Hugo], a static site generator, allowing me to write in
 https://asciidoctor.org/[AsciiDoc]. Add https://github.com/taseroth[GitHub] and https://www.netlify.com/[Netlify]

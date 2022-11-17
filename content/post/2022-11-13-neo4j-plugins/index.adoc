@@ -1,0 +1,245 @@
++++
+title= "Introduction to Neo4j Plugins"
+slug= "neo4j-plugins"
+description = "What are Neo4j plugins, when do I need them and when should I not use them. Also with an overview on how they work"
+date= 2022-11-13T16:04:43+01:00
+lastmod= 2022-11-13T16:04:43+01:00
+tags = [ "Neo4j", "Plugin", "Java"]
+layout= "post"
+type=  "post"
+draft= false
+[[resources]]
+  name = "feature"
+  src = "img/header.png"
++++
+
+In this post, I will discuss Neo4j Plugins, what they are, how they work and when you should consider them. And also when you should not use them. This is the long-text version of my lighting talk at https://neo4j.com/nodes-2022/[Nodes 2022]. I realised that 10-15 minutes are way too short to explain all that I wanted to explain.
+
+== What are plugins and how do I use them
+Neo4j plugins are Java jar files that reside inside the `/plugins/` folder of a Neo4j installation. At startup, Neo4j scans `*.jar` files in that directory and adds annotated code to the available functionality in the database.
+
+Code inside plugins gets executed inside the same JVM as the database itself and therefore has the same privileges as the database. Plugins also share the resources with the database, so care must be taken with the usage of threads and memory.
+
+Java functions inside the plugin annotated with `@Procedure` or `@UserFunction`  (or `@UserAggregationFunction`, but not discussed in this article) will be recognised and can then be called via Cypher.
+An example of a user-defined procedure declaration:
+[source,java]
+----
+
+    @Procedure(value = "example.getRelationshipTypes", mode = Mode.READ)  <1> <2>
+    @Description("Get the different relationships going in and out of a node.") <3>
+    public Stream<RelationshipTypes> getRelationshipTypes(@Name("node") Node node) { <4> <5>
+
+----
+<1> The `value` defines the name under which the procedure can be called. Dot separated namespaces are supported.
+<2> The `mode` can be either `READ` or `WRITE` indicating if the procedure will change data in the database. Specifying `READ` and trying to change data inside the procedure will lead to an exception.
+<3> Short description of the procedure, `SHOW PROCEDURES` will use this to help the user.
+<4> Procedures must return a `Stream<X>` where `X` is a type the Bolt driver supports.
+<5> With `@Name()` parameters of the procedure are declared. Also allows to define a `defaultValue`, allowing users to omit that parameter.
+
+With this in place, the procedure can be invoked via:
+[source]
+----
+MATCH (p:Person {name: 'Tom Hanks'})
+CALL example.getRelationshipTypes(p)
+----
+
+A well-known example of a Neo4j plugin is https://neo4j.com/labs/apoc/4.4/[APOC] (Awesome Procedures On Cypher) which comes bundled with newer versions of Neo4j. APOC contains > 500 procedures and functions and is a good starting point to check if the needed functionality is already available there.
+
+== When to use them, and when not
+
+While plugins provide great flexibility for graph traversals, they also come with some drawbacks:
+
+* More difficult to manage and test than simple Cypher.
+* Each change of the plugin requires a restart of the Neo4j server. While this can be done without service interruption in a clustered environment, for single instances this means that all connected applications become unavailable for a short time.
+* Plugins are not available in https://neo4j.com/docs/aura/[Aura].
+* Cypher allows inspecting query execution via `EXPLAIN` or `PROFILE`. Calls to procedures are a black box for the Cypher engine and other methods must be used to find bottlenecks.
+
+It is therefore recommended to use Cypher as long as possible and only use plugins when Cypher is not performant enough. In my experience, this is mostly for complex traversals and algorithms the case, where on each step of the traversal business rules must be applied.
+
+Another valid reason to implement plugins is for https://neo4j.com/docs/java-reference/current/extending-neo4j/security-plugins/[custom authentication] providers. With Neo4js support for SSO and LDAP, very few authentication schemes can not be applied without a custom plug.
+
+== What functionality is available to plugins
+
+Plugins extend the functionality available in Neo4j. The Neo4j DBMS provides the https://neo4j.com/docs/java-reference/current/extending-neo4j/[Java API] and the https://neo4j.com/docs/java-reference/current/traversal-framework/[Traversal API] to plugins.
+
+=== Injectables
+
+Classes annotated with `@Procedure` methods can ask for objects to be injected via fields annotated with `@Context`. Examples:
+
+[source,java]
+----
+@Context
+public GraphDatabaseService db;
+
+@Context
+public Log log;
+
+@Context
+public Transaction tx;
+----
+Such annotated fields must be `public` and non-static.
+
+The following types can be injected:
+
+.Types available for injection
+[%header,cols="1,2"]
+|===
+| Type | Description
+
+| org.neo4j.logging.Log
+a| Gives access to No4j Logging facilities. Logging levels supported via:
+
+* `LOG.error("..")`,
+* `LOG.warn("..")`
+* `LOG.info("..")`,
+* `LOG.debug("..")`
+
+It supports placeholder substitution via `"some string: %s, some number: %d "` and so on.
+
+| org.neo4j.graphdb.Transaction
+| Access to the currently running transaction, can be used to lookup nodes or run Cypher queries.
+
+| org.neo4j.graphdb.GraphDatabaseService
+| Can be used to start transactions via `.beginTx()`. Can also be used to query for the name of the current database in use via `.databaseName()`
+
+|===
+There are more injectable types, such as `GraphDatabaseAPI`, `DependencyResolver`, `SecurityContext`, `ProcedureCallContext` and `SystemGraphComponents` but they are not generally meant for public usage and require knowledge of the inner working of the Neo4j DBMS.
+
+
+=== Java API
+
+What would a typical use of the Java API look like? Let's turn the following Cypher:
+[source]
+----
+MATCH (hanks:Person {name: 'Tom Hanks'})-[:DIRECTED]->(movie)
+return collect(movie.title)
+----
+
+into Java:
+[source,java]
+----
+var hanks = tx.findNode(Label.label("Person"), "name", "Tom Hanks"); <1>
+return StreamSupport.stream( <2>
+           hanks.getRelationships(Direction.OUTGOING, RelationshipType.withName("DIRECTED")) <3>
+       .spliterator(), false)
+             .map(Relationship::getEndNode) <4>
+             .map(movie -> movie.getProperty("title")) <5>
+             .collect(Collectors.toSet()); <6>
+----
+<1> Find the `:Person` node by `name` attribute. This throws an exception if more then one node is found and returns `null` if no such node exists. This will use an index if it exists.
+<2> Turn the `iterable` into a Java stream for ease of processing.
+<3> Find all outgoing relationships of the given type from the hanks node. Multiple versions of that functionality are provided (single relationship, independent of direction, ..).
+<4> Get the end node of relationships.
+<5> Extract the value of the property `title`.
+<6> Collect into a `Set<String`.
+
+From this simplified example it is obvious that Cypher is a lot more more concise, but the Java API provides more flexibility.
+
+A lot of code in plugins will follow that pattern: find nodes, resolve relationships, filter and continue.
+
+The API does also provides functionality to create and delete nodes and relationships as well as set and remove properties.
+
+==== Threads and Transactions
+
+Plugins can start new threads to process and traverse the graph in parallel if needed. Care must be taken when passing data between threads. Transactions in Neo4j are always bound to a thread. Entities returned from the Java API via `tx.findNodes(..)` or similar functions are proxies and these proxies are bound to a transaction (and therefore to a thread). Passing an entity from one thread/tx to another and then trying to access that entity (`getAttribute()`, `getRelationships()`, .. ) will lead to an error at runtime.
+
+To circumvent that problem, pass the internal Id of the entity to new threads:
+[source,java]
+----
+var nodeId = node.getId(); <1>
+
+var node = tx.getNodeById(nodeId); <2>
+----
+<1> Get the internal Id of the node. This will be a `long`.
+<2> Retrieve the node by its internal Id in the other thread/transaction. Since these Ids are pointers into the store, this will not incur an observable performance penalty.
+
+=== Traversal API
+
+The https://neo4j.com/docs/java-reference/current/traversal-framework/[Traversal API] provides an easy way to crawl through the graph and collect data while doing so. Implementations provide starting points, Evaluators and Expanders to the API. In link:/2021/01/neo4j-traversal-api/[my last post], I discussed the details in more depth.
+
+The traversal API takes some of the burdens away by providing a simple(r) interface, but with the penalty that it is currently not possible to use multiple threads in doing so.
+
+=== Transaction Event Handlers
+
+Neo4j does not currently have the concept of Triggers. https://neo4j.com/docs/java-reference/current/transaction-management/#transactions-events[Transaction Event Handlers] are a way to mimic trigger functionality. Handlers must be registered at database start (and removed when the database stops). The interface `TransactionEventListener` must be implemented and registered handlers will be called during the transaction live cycle, esp:
+
+* before a transaction is committed
+* after a transaction is committed
+* after a transaction is rolled-back
+
+The callbacks will receive the changes contained in the transaction and can act on those.
+
+Transaction event handlers can be problematic in a clustered environment and should be avoided if possible.
+
+== How can to test plugins
+
+The Neo4j test harness provides an easy way to test your procedures and functions. It integrates with https://junit.org/junit5/[JUnit] and allows to start an embedded Neo4j for testing. The typical setup is as follows:
+
+* Configure and start an embedded Neo4j per test class.
+* If needed, provide test data either per cypher scripts or by providing a database store.
+* Call your procedure during `@Test` functions via cypher.
+* Stop the database after the last test.
+
+Annotated example from the https://github.com/neo4j-examples/neo4j-procedure-template[procedure template project]:
+
+[source,java]
+----
+@TestInstance(TestInstance.Lifecycle.PER_CLASS) <1>
+public class JoinTest {
+
+    private static final Config driverConfig = Config.builder().withoutEncryption().build(); <2>
+    private Neo4j embeddedDatabaseServer;
+
+    @BeforeAll
+    void initializeNeo4j() {
+        this.embeddedDatabaseServer = Neo4jBuilders.newInProcessBuilder() <3>
+                .withDisabledServer() <4>
+                .withFunction(Join.class) <5>
+                .withFixture(..) <6>
+                .build(); <7>
+    }
+----
+<1> Tells JUnit to create one instance per test class.
+<2> Create a driver config.
+<3> Start building the in-memory Neo4j database
+<4> Disable the webserver functionality for the embedded  database
+<5> Load the class under test into the embedded Neo4j.
+<6> Provide test data either as Cypher string or as a `Path` to a file containing cypher.
+<7> Start the embedded instance.
+
+A typical test case would look similar to this:
+[source,java]
+----
+@Test
+void joinsStrings() {
+    try(Driver driver = GraphDatabase.driver(embeddedDatabaseServer.boltURI(), driverConfig); <1>
+        Session session = driver.session()) { <2>
+
+        var result = session.run("CALL our.procedure()"); <3>
+    }
+}
+----
+<1> Create a driver object from the embedded instance.
+<2> Create a session from the driver.
+<3> Run the procedure and test for correct results (not shown)
+
+
+It is also possible to debug plugins. With test classes as the above, one can simply set breakpoints in the plugin code. When starting the test through an IDE, the IDE will stop at the breakpoint and will allow stepping through the code.
+
+To be able to debug a running Neo4j server, a config option in `conf/neo4j.con` must be enabled. It is included by default, but commented out:
+[source]
+----
+# Enable remote debugging
+dbms.jvm.additional=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+----
+After a restart of Neo4j, the debugger can connect through port `5005`. Care must be taken that the code in the IDE/debugger reflects the version of the plugin deployed in the server.
+
+== How to start a new Plugin Project.
+
+A good starting point for a plugin project is the https://github.com/neo4j-examples/neo4j-procedure-template[procedure template project] on GitHub. It provides the maven infrastructure and examples, especially for setting up tests.
+
+The `neo4j.version` property in the contained `pom.xml` needs to be adjusted to the Neo4j version in use.
+
+Feedback and pull requests to that GitHub project are always welcome.
+
+
