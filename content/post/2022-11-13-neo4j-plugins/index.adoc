@@ -13,7 +13,7 @@ draft= false
   src = "img/header.png"
 +++
 
-In this post, I will discuss Neo4j Plugins, what they are, how they work and when you should consider them. And also when you should not use them. This is the long-text version of my lighting talk at https://neo4j.com/nodes-2022/[Nodes 2022]. I realised that 10-15 minutes are way too short to explain all that I wanted to explain.
+In this post, I will discuss Neo4j Plugins, what they are, how they work and when you should consider them. And also when you should not use them. This is the long-text version of my lighting talk at https://neo4j.com/nodes-2022/[Nodes 2022] (https://taseroth.github.io/slides-intro-plugins/#/[Slides]). I realised that 10-15 minutes are way too short to explain all that I wanted to explain.
 
 == What are plugins and how do I use them
 Neo4j plugins are Java classes packaged as jar files that reside inside the `/plugins/` folder of a Neo4j installation. At startup, Neo4j scans `*.jar` files in that directory and adds annotated code to the available functionality in the database.
