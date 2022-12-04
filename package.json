@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "netlify-plugin-mastodon-alias": "^1.0.1",
     "postcss-cli": "^8.3.1"
   }
 }
