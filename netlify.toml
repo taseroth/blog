@@ -33,10 +33,3 @@ HUGO_ENABLEGITINFO = "true"
 from = "/npmjs/*"
 to = "/npmjs/"
 status = 200
-
-[[plugins]]
-package = "netlify-plugin-mastodon-alias"
-
-[plugins.inputs]
-username = "taseroth"
-instance = "chaos.social"
