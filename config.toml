@@ -21,7 +21,7 @@ title = "Bert Radke"
 [security]
 enableInlineShortcodes = false
 [security.exec]
-allow = ['^dart-sass-embedded$', '^go$', '^npx$', '^postcss$', '^asciidoctor$']
+allow = ['^dart-sass-embedded$', '^go$', '^npx$', '^postcss$', '^asciidoctor$', '^git$']
 osEnv = ['(?i)^(PATH|PATHEXT|APPDATA|TMP|TEMP|TERM)$']
 [security.funcs]
 getenv = ['^HUGO_']
