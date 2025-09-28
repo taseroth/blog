@@ -1,4 +1,9 @@
 <section class="social">
+  {{ with .Site.Params.social.mastodon }}
+  <a href="{{ . }}" rel="me">
+    <i class="icon icon-mastodon" aria-hidden="true"></i>
+  </a>
+  {{ end }}
 	{{ with .Site.Params.social.twitter }}
 	<a href="https://twitter.com/{{.}}" rel="me"><i class="icon icon-twitter" aria-hidden="true"></i></a>
 	{{ end }}

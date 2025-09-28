@@ -36,12 +36,10 @@ urls = ['.*']
 ## Social Accounts
 [params.social]
     github = "taseroth"
-#    xing = "Bert_Radke"
     linkedin = "bert-radke-3a533736"
-    twitter = "taseroth"
     stackoverflow = "132270/bert"
     email = "bert.radke@pm.me"
-#    keybase = "bertradke"
+    mastodon = "https://chaos.social/@taseroth"
 
 [permalinks]
   post = "/:year/:month/:slug/"

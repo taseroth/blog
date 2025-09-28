@@ -1,6 +1,6 @@
 {{ partial "header/styles-highlight.html" . }}
 
-{{ if .Site.IsServer }}
+{{ if hugo.IsServer }}
 {{ $cssOpts := (dict "targetPath" "styles/main.css" "enableSourceMap" true ) }}
 {{ $styles := resources.Get "scss/main.scss" | toCSS $cssOpts }}
 <link rel="stylesheet" href="{{ $styles.RelPermalink }}" media="screen">

@@ -1,7 +1,4 @@
-{{ if .Site.GoogleAnalytics }}
-  <!-- Google Analytics -->
-  {{ template "_internal/google_analytics_async.html" . }}
-{{ end }}
+
 {{ partial "highlight-js.html" . }}
 {{ with .Site.Params.toc }}
 {{ if eq . "tocbot" }}
