@@ -1,5 +1,13 @@
 {
+  "scripts": {
+    "hugo": "PATH=\"$PWD/node_modules/.bin:$PATH\" hugo",
+    "build": "npm run hugo -- --gc --minify --cleanDestinationDir"
+  },
   "dependencies": {
     "postcss-cli": "^8.3.1"
+  },
+  "devDependencies": {
+    "@asciidoctor/cli": "^4.0.0",
+    "@asciidoctor/core": "^3.0.4"
   }
 }

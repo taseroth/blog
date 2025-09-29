@@ -1,33 +1,37 @@
 [build]
 publish = "public"
-command = "hugo --gc --minify"
+# Calls your package.json script: "build": "npm run hugo -- --gc --minify --cleanDestinationDir"
+command = "npm run build"
 
-[context.production.environment]
+[build.environment]
 HUGO_VERSION = "0.150.0"
+NODE_VERSION = "20"
+
+# --- production ---
+[context.production]
+command = "npm run build -- --gc --minify --cleanDestinationDir"
+[context.production.environment]
 HUGO_ENV = "production"
 HUGO_ENABLEGITINFO = "true"
 
+# --- split1 (if you use it) ---
 [context.split1]
-command = "hugo --gc --minify --enableGitInfo"
-
+command = "npm run build -- --gc --minify --cleanDestinationDir --enableGitInfo"
 [context.split1.environment]
 HUGO_VERSION = "0.150.0"
 HUGO_ENV = "production"
 
+# --- deploy previews ---
 [context.deploy-preview]
-command = "hugo --gc --minify --buildFuture -b $DEPLOY_PRIME_URL"
-
+command = "npm run build -- --gc --minify --cleanDestinationDir --buildFuture -b $DEPLOY_PRIME_URL"
 [context.deploy-preview.environment]
 HUGO_VERSION = "0.150.0"
 
+# --- branch deploys ---
 [context.branch-deploy]
-command = "hugo --gc --minify -b $DEPLOY_PRIME_URL"
-
+command = "npm run build -- --gc --minify --cleanDestinationDir -b $DEPLOY_PRIME_URL"
 [context.branch-deploy.environment]
 HUGO_VERSION = "0.150.0"
-
-[context.next.environment]
-HUGO_ENABLEGITINFO = "true"
 
 [[redirects]]
 from = "/npmjs/*"
