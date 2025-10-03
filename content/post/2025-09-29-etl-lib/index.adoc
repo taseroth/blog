@@ -2,8 +2,8 @@
 title= "Introducing Neo4j ETL Lib"
 slug= "etl-lib"
 description = "Introducing Neo4j ETL Lib"
-date= 2025-09-29T11:45:21+02:00
-lastmod= 2025-09-29T11:45:21+02:00
+date= 2025-10-03T11:45:21+02:00
+lastmod= 2025-10-03T11:45:21+02:00
 tags = [ "ETL", "Python"]
 layout= "post"
 type=  "post"
@@ -18,16 +18,16 @@ draft= false
   src = "img/header.png"
 +++
 
-Yet another ETL tool I hear you ask. Well, kind of. But this is not a complete tool but a set of lego bricks that you can stack together to build an ETL pipeline. There are plenty of enterprise grade ETL solutions out there and if you have access to them, use them. But, often enough, even in large organisations, I encounter teams that can not or want no use these solutions.
+Yet another ETL tool, you ask? Well, kind of. But this is not a complete tool; it's a set of LEGO bricks you can stack together to build an ETL pipeline. There are plenty of enterprise-grade ETL solutions out there and, if you have access to them, use them. But often enough—even in large organisations—I encounter teams that cannot or do not want to use these solutions.
 
-Working as a consultant for database company, I often help customer loading data into Neo4j. Often, this starts of as a collection of https://neo4j.com/docs/cypher-manual/5/clauses/load-csv/[LOAD CSV] scripts during a PoC phase. When moving into MVP or production stage, these scripts lack some core requirements I deem essential:
+Working as a consultant for a database company, I often help customers load data into Neo4j. Often, this starts off as a collection of [https://neo4j.com/docs/cypher-manual/5/clauses/load-csv/[LOAD](https://neo4j.com/docs/cypher-manual/5/clauses/load-csv/[LOAD) CSV] scripts during a PoC phase. When moving into MVP or production, these scripts lack some core requirements I deem essential:
 
-* Logging of performed task and their outcome
+* Logging of performed tasks and their outcomes
 * Error handling
 * Data validation
 * Streaming and batching
 
-This toolbox provides all of them and a few more while all you have to do is placing the Cypher commands (you may already have from the PoC phase) into Python, add some code to set up the environment (with support by the toolbox) and optionally provide some Pydantic classes for data validation.
+This toolbox provides all of them, and a few more, while all you have to do is place the Cypher commands (you may already have them from the PoC phase) into Python, add some code to set up the environment (with support from the toolbox), and optionally provide some Pydantic classes for data validation.
 
 == Tasks
 
@@ -53,9 +53,9 @@ class LoadAgenciesTask(CSVLoad2Neo4jTask):
         """
 ----
 
-The above would perform loading of the CSV data in batches and write them back in batches to the graph, while collecting statistics such as nodes/relationships/properties added and https://neo-technology-field.github.io/python-etl-lib/reporting.html[reporting] these statistics.
+The above loads the CSV data in batches and writes them in batches to the graph, while collecting statistics such as nodes/relationships/properties added and (https://neo-technology-field.github.io/python-etl-lib/reporting.html[reporting)] these statistics.
 
-These task can then be placed into pipelines and executed. https://neo-technology-field.github.io/python-etl-lib/source/etl_lib.core.Task.html#etl_lib.core.Task.TaskGroup[(Parallel)TaskGroups] allow building more structured pipelines. An example pipeline (again from https://github.com/neo-technology-field/python-etl-lib/tree/main/examples/gtfs[GTFS]):
+These tasks can then be placed into pipelines and executed. (https://neo-technology-field.github.io/python-etl-lib/source/etl_lib.core.Task.html#etl_lib.core.Task.TaskGroup[(Parallel)TaskGroups] allow building more structured pipelines. An example pipeline (again from https://github.com/neo-technology-field/python-etl-lib/tree/main/examples/gtfs[GTFS)]):
 
 [source, Python]
 ----
@@ -82,9 +82,9 @@ all_group.execute()
 
 https://neo-technology-field.github.io/python-etl-lib/reporting.html[Reporting] is always done to stdout and file. Optionally, depending on a single environment variable, information about performed tasks and pipelines is also written to a https://neo-technology-field.github.io/python-etl-lib/reporting.html#neo4j-reporter[Neo4j database].
 
-A simple NeoDash dashboard (this still needs some love) is provided that allows viewing this statistics. As the statistic data is updated during the run of the pipeline, this also allows viewing the progres of running pipelines.
+A simple NeoDash dashboard (this still needs some love) is provided that allows viewing these statistics. As the statistic data are updated during the run of the pipeline, this also allows viewing the progress of running pipelines.
 
-The same information can be viewed from the cli via provided commands. The https://neo-technology-field.github.io/python-etl-lib/cli.html#[provided cli] component makes embedding this into ones own program easy. Example of viewing the details of one specific pipeline execution:
+The same information can be viewed from the CLI via provided commands. The https://neo-technology-field.github.io/python-etl-lib/cli.html#[provided CLI] component makes embedding this into one's own program easy. Example of viewing the details of one specific pipeline execution:
 
 [source, bash]
 ----
@@ -107,30 +107,29 @@ Showing details for run ID: 69260954-0b94-4043-be1b-f99ce5a64d3a
 +-------------------------------------------------------------------------------+----------+-----------+------------+-----------+
 ----
 
-
 == Data Sources (and sinks)
 
 At the time of writing, the ETL lib supports reading from:
 
 * CSV files
-* SQL Databases
-* Neo4j Databases
+* SQL databases
+* Neo4j databases
 
 See https://neo-technology-field.github.io/python-etl-lib/data-sources.html#[Data Sources] and https://neo-technology-field.github.io/python-etl-lib/data-sinks.html[Data Sinks] for more information.
 
-Since tasks are internally composed of https://neo-technology-field.github.io/python-etl-lib/batching.html[BatchProcessors], adding new sources and sinks is rather easy. I plan to add support for https://parquet.apache.org/[Parquet] and https://avro.apache.org/[Avro] soon.
+Since tasks are internally composed of https://neo-technology-field.github.io/python-etl-lib/batching.html[BatchProcessors], adding new sources and sinks is fairly easy. I plan to add support for https://parquet.apache.org/[Parquet] and https://avro.apache.org/[Avro] soon.
 
-== Parallel Data loading
+== Parallel Data Loading
 
 Ever since I read the excellent https://neo4j.com/blog/developer/mix-and-batch-relationship-load/[Mix and Batch] blog post by my colleague Eric Monk, I wanted to build tooling for this in pure Python. I also wanted to wait with this blog post until I had this implemented in this library.
 
-In short, this technique allows to split data into batches that do not overlap. This is especially important when writing relationships. It does so by placing data onto an array where the rows and columns are derived from the data (say, the last digit of the node id). The cells form the batches. Parallel stripes of of these cells are the batches that can be loaded in parallel.
+In short, this technique allows data to be split into batches that do not overlap. This is especially important when writing relationships. It does so by placing data onto an array where the rows and columns are derived from the data (say, the last digit of the node ID). The cells form the batches. Parallel stripes of these cells are the batches that can be loaded in parallel.
 
-Incoming data is fetched ahead and placed into the buffer. When diagonal stripe of cells fulfills the criteria to be released (esp. each cell has the `batch_size` of items), this diagonal stripe is released to the next step (here, the writing to the database).
+Incoming data is prefetched and placed into the buffer. When a diagonal stripe of cells fulfils the criteria to be released (especially when each cell has at least `batch_size` items), this diagonal stripe is released to the next step (here, writing to the database).
 
 I implemented an https://github.com/neo-technology-field/python-etl-lib/tree/main/examples/nyc-taxi[example] to showcase this.
 
-When enabling DEBUG mode, the matrix is printed out:
+When enabling DEBUG mode, the matrix is printed:
 
 [source]
 ----
@@ -151,12 +150,11 @@ When enabling DEBUG mode, the matrix is printed out:
 +-----+---------+---------+---------+--------+-------+--------+---------+--------+---------+---------+
 ----
 
-You can see the cells with their current number of items stored in them. The cells with the `[1234]` are the ones that are released in that moment.
+You can see the cells with their current number of items. The cells with the `[1234]` are the ones released at that moment.
 
-To use it, you only need to provide the Cypher to write the batches. See http://localhost:8888/_build/html/parallel.html#mix-and-batch[Mix and Batch] in the documentation.
+To use it, you only need to provide the Cypher to write the batches. See https://neo-technology-field.github.io/python-etl-lib/parallel.html#mix-and-batch[Mix and Batch] in the documentation.
 
-The speedup that can be achieved depends on many factors, so it is hard to predict. Factors that influence this include CPU cores available for the CPU, network latency, available IO and others. Unscientific test on my local laptop with Neo4j running in docker and Neo4j on a gcp instance for loading the NYC taxi data:
-
+The achievable speed-up depends on many factors, so it is hard to predict. Influencing factors include available CPU cores, network latency, available I/O, and others. Unscientific tests on my local laptop with Neo4j running in Docker, and on a GCP instance for loading the NYC taxi data:
 
 |===
 |Environment | Sequential | Parallel
@@ -174,10 +172,9 @@ The speedup that can be achieved depends on many factors, so it is hard to predi
 All numbers are minutes to run the full import against an empty database (run multiple times and averaged).
 
 
-
-There is also another option to process data in parallel using http://localhost:8888/_build/html/parallel.html#paralleltaskgroup[ParallelTaskGroups]. This is much simpler but only works if the data writen is known not to touch the same parts in the graph.
+There is also another option to process data in parallel using https://neo-technology-field.github.io/python-etl-lib/parallel.html#paralleltaskgroup[ParallelTaskGroups]. This is much simpler but only works if the data written is known not to touch the same parts in the graph.
 
 == Testing
 
-Last, bot not least, the lib contains https://neo-technology-field.github.io/python-etl-lib/testing.html[pytest fixtures and functions] to allow testing of the pipelines. It uses the excellent https://testcontainers.com/[TestContainers] library to run tests with the DB running in a docker environment.
+Last, but not least, the lib contains https://neo-technology-field.github.io/python-etl-lib/testing.html[pytest fixtures and functions] to allow testing of the pipelines. It uses the excellent https://testcontainers.com/[TestContainers] library to run tests with the DB running in a Docker environment.
 
