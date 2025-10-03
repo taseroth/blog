@@ -8,6 +8,16 @@ tags = [ "Spring Boot", "JDBC", "Java"]
 layout= "post"
 type=  "post"
 draft= true
+{{- if and (isset .Site.Params.comments "host") (isset .Site.Params.comments "username") }}
+{{- if and (ne .Site.Params.comments.host "") (ne .Site.Params.comments.username "") }}
+[comments]
+host= "chaos.social"
+username= "taseroth"
+id=
+
+{{ end -}}
+{{ end -}}
+
 [[resources]]
   name = "feature"
   src = "img/header.jpg"
