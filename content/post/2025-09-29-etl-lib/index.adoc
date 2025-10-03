@@ -18,7 +18,7 @@ draft= false
   src = "img/header.png"
 +++
 
-Yet another ETL tool, you ask? Well, kind of. But this is not a complete tool; it's a set of LEGO bricks you can stack together to build an ETL pipeline. There are plenty of enterprise-grade ETL solutions out there and, if you have access to them, use them. But often enough—even in large organisations—I encounter teams that cannot or do not want to use these solutions.
+https://neo-technology-field.github.io/python-etl-lib/index.html[Yet another ETL tool], you ask? Well, kind of. But this is not a complete tool; it's a set of LEGO bricks you can stack together to build an ETL pipeline. There are plenty of enterprise-grade ETL solutions out there and, if you have access to them, use them. But often enough—even in large organisations—I encounter teams that cannot or do not want to use these solutions.
 
 Working as a consultant for a database company, I often help customers load data into Neo4j. Often, this starts off as a collection of https://neo4j.com/docs/cypher-manual/5/clauses/load-csv/[LOAD) CSV] scripts during a PoC phase. When moving into MVP or production, these scripts lack some core requirements I deem essential:
 
