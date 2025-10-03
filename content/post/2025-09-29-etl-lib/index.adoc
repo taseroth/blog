@@ -11,7 +11,7 @@ draft= false
 [comments]
     host= "chaos.social"
     username= "taseroth"
-    id= 115311120117851334[114210311792018439
+    id= 115311120117851334
 
 [[resources]]
   name = "feature"
