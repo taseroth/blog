@@ -7,23 +7,23 @@ lastmod= 2026-04-15T13:19:01+01:00
 tags = [ "ETL", "Python"]
 layout= "post"
 type=  "post"
-draft= true
+draft= false
 [comments]
 host= "chaos.social"
 username= "taseroth"
-id=
+id=123456
 
 [[resources]]
   name = "feature"
   src = "img/header.jpg"
 +++
 
-In this blogpost, we will start building a simple ETL pipeline using the https://neo-technology-field.github.io/python-etl-lib/index.html[Neo4j-ETL-Lib]. The pipeline will load some fictionary CSV data. Concepts and ideas will be explained along the way.
+In this blog post, we will start building a simple ETL pipeline using the https://neo-technology-field.github.io/python-etl-lib/index.html[Neo4j-ETL-Lib]. The pipeline will load some fictional CSV data. Concepts and ideas will be explained along the way.
 
 == CSV Data
 I have chosen a simple domain with just enough detail to explain how to use the etl-lib. You know, the typical e-commerce example: Customers order products.
 
-In our fictional example we receive the product catalog as `products.csv`:
+In our fictional example, we receive the product catalog as `products.csv`:
 
 .products.csv
 |===
@@ -46,18 +46,18 @@ And the customer orders as `orders.csv`:
 Not much to it, just the bare minimum to explain some features later.
 
 == Data Model
-Our target data model we are going to use is pictured below:
+Our target data model is pictured below:
 
 [#img-schema, role="img-responsive"]
 .data model
 image::img/e-commerce.png[data model]
 
-Again, all very simple. Focus is on how to use the etl-lib and the benefits it hopefully brings.
+Again, all very simple. The focus is on how to use the etl-lib and the benefits it hopefully brings.
 
 == Loading the data
 A simple LOAD CSV to load the products data would be:
 
-[code,cypher]
+[source]
 -----
 LOAD CSV WITH HEADERS FROM 'file:///products.csv' AS row
 MERGE (c:Category {id: row.category_id})
@@ -69,13 +69,13 @@ SET p.name = row.name,
 MERGE (p)-[:BELONGS_TO]->(c)
 -----
 
-While this is fine and can be extended with batching, it is hard to run autonomously, trace executions, failures and so on.
+While this is fine and can be extended with batching, it is hard to run autonomously, trace executions, handle failures, and so on.
 
-To load the same data with the library, we need to wrap that inside a `Task` derived class.
+To load the same data with the library, we need to wrap that inside a class derived from `Task`.
 
-The etl-lib provides multiple such classes to load data from various data sources. One such class is `CSVLoad2Neo4jTask`. Below code uses that class to load exactly the same data:
+The etl-lib provides multiple such classes to load data from various data sources. One such class is `CSVLoad2Neo4jTask`. The code below uses that class to load exactly the same data:
 
-[code,python]
+[source, Python]
 ----
 class LoadProducts(CSVLoad2Neo4jTask):
 
@@ -95,13 +95,13 @@ class LoadProducts(CSVLoad2Neo4jTask):
         """
 ----
 <1> Pass in the context and file path
-<2> The etl-lib work with batches for improved performance, hence we need to `UNWIND` the batches in the first line. The batch size defaults to 5000 but can be configured via init param.
+<2> The etl-lib works with batches for improved performance, hence we need to `UNWIND` the batches in the first line. The batch size defaults to 5000 but can be configured via an init param.
 
 
 == Building the pipeline
-The above `LoadProducts` class does run on its own, it needs to be part of a pipeline and have access to a `ETLContext` instances, which provides access to databases, logging and so on:
+The above `LoadProducts` class can not run on its own; it needs to be part of a pipeline and have access to an `ETLContext` instance, which provides access to databases, logging and so on:
 
-[code,python]
+[source, Python]
 ----
 @cli.command("import") <1>
 @click.argument('input_directory', type=click.Path(exists=True, file_okay=False, dir_okay=True, path_type=Path))
@@ -136,14 +136,16 @@ def main(ctx, input_directory):
 ----
 <1> 'Inherit' common command line options provided by the etl-lib
 <2> Needed to have access to the above commands
-<3> Create a context from the parameters provided commandline or environment parameters. The context is used to pass access to infrastructure objects such as databases and logging.
+<3> Create a context from the parameters provided via the command line or environment parameters. The context is used to pass access to infrastructure objects such as databases and logging.
 <4> Instantiate our loading class
 <5> Optionally group multiple Tasks together
 <6> Register the task tree with the reporter, so that statistics can be gathered and reported.
 <7> Start the pipeline
 
-We need to pass the connection details to that python code. This can be done via cli parameters or by adding the following to `.env`:
-[source,bash]
+The full sample code for this demo can be found at https://codeberg.org/taseroth/etl-pipeline. Look at the tag `v1..` as this represents the version used in this blog post.
+
+We need to pass the connection details to that Python code. This can be done via CLI parameters or by adding the following to `.env`:
+[source, bash]
 ----
 NEO4J_URI=neo4j://localhost:7687
 NEO4J_USERNAME=neo4j
@@ -155,10 +157,10 @@ LOG_FILE=import.log
 So, what do we gain with all that code?
 
 * As mentioned above: batching, even if that is not needed for our sample dataset. Rows from the data source are batched transparently and passed through the processors. Right now, with that simple pipeline, this might not be needed, but for real data it will be.
-* Reporting. Right now, only to the logfile configured. We will enable reporting to a database in the next example.
+* Reporting. Right now, it only reports to the configured logfile. We will enable reporting to a database in the next example.
 
 Starting the pipeline with `python pipeline.py import data/small` would produce the following log:
-[source,log]
+[source, bash]
 ----
 2026-04-15 16:52:43,841 - INFO - root - [MainThread] - Processing directory: data/small
 2026-04-15 16:52:43,841 - INFO - root - [MainThread] - Neo4j URL: neo4j://localhost:7687
@@ -194,7 +196,7 @@ In the below snippet, I added 2 Tasks:
 * `LoadOrders` is very similar to `LoadProducts` but for loading the `orders.csv`
 * `SchemaTask` is a thin wrapper around some `CREATE CONSTRAINT IF NOT EXISTS FOR` statements, ensuring we have constraints and indexes in place. It is idempotent, so we can run it each time with the pipeline.
 
-[code,python]
+[source, Python]
 ----
     load_prods = LoadProducts(context=context, file=input_directory / "products.csv")
     load_orders = LoadOrders(context=context, file=input_directory / "orders.csv")
@@ -207,7 +209,7 @@ In the below snippet, I added 2 Tasks:
 ----
 
 The output becomes a bit more interesting now:
-[source,log]
+[source, bash]
 ----
 2026-04-15 19:26:25,338 - INFO - root - [MainThread] - Processing directory: data/small
 2026-04-15 19:26:25,338 - INFO - root - [MainThread] - Neo4j URL: neo4j://localhost:7687
@@ -260,9 +262,9 @@ The output becomes a bit more interesting now:
 +-------------------------+-----------------+---------------------+------------------+----------------+------------------+
 ----
 
-As you can see, the `Task`s form a tree. Each `Task` and `TaskGroup` reports some statistics. With the last one the overall statistics for the pipeline.
+As you can see, the `Task`s form a tree. Each `Task` and `TaskGroup` reports some statistics, with the last one reporting the overall statistics for the pipeline.
 Running the same pipeline again with the same data (and an already filled database), we can see that the stats report very different numbers:
-[source,log]
+[source, bash]
 ----
 +------------------+------------------+
 |   properties_set |   csv_lines_read |
@@ -273,14 +275,14 @@ Running the same pipeline again with the same data (and an already filled databa
 
 That is already quite helpful.
 
-== Reporting to a a database
-By simply setting `REPORTER_DATABASE=neo4j` in the environment (`.env` file), the reporter will write these statistics to a database. The database pointed could be a separate from the database we load the data into.
-The log will report with database it is using:
+== Reporting to a database
+By simply setting `REPORTER_DATABASE=neo4j` in the environment (`.env` file), the reporter will write these statistics to a database. The database pointed to could be separate from the database we load the data into.
+The log will report which database it is using:
 
 `INFO - etl_lib.core.ProgressReporter.Neo4jProgressReporter - [MainThread] - progress reporting to database: neo4j`
 
 Running
-[code,cypher]
+[source, Cypher]
 ----
 MATCH p=(:ETLRun)-->*()
 RETURN p
@@ -291,8 +293,8 @@ We will see something like
 .Run Statistics
 image::img/run-graph.png[run statistics]
 
-This graph is updated with each batch processed. So, having long-running pipelines, you can see the progress. The etl-lib also provides a Neo4j dashboard that provides overview and details on etl runs. The imported `@cli` also added cli commands to query and manage statistics:
-[code,bash]
+This graph is updated with each batch processed. So, having long-running pipelines, you can see the progress. The etl-lib also provides a Neo4j dashboard that provides an overview and details on ETL runs. The imported `@cli` also added CLI commands to query and manage statistics:
+[source, bash]
 ----
 python pipeline.py
 Usage: pipeline.py [OPTIONS] COMMAND [ARGS]...
@@ -323,5 +325,7 @@ Commands:
   query   Retrieve the list of the last x ETL runs from the database and...
 ----
 For more information use the `--help` on the cli.
+
+In the next part, we will look at more advanced features of the Neo4j-ETL-Lib.
 
 

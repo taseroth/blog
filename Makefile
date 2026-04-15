@@ -51,7 +51,7 @@ build: check
 
 .PHONY: dev
 dev: check
-	hugo server -D
+	npm run hugo -- server -D
 
 .PHONY: clean
 clean:
